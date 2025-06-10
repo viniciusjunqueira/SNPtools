@@ -1,0 +1,11 @@
+citHeader("Para citar o pacote 'SNPtools' em publicações, use:")
+
+bibentry(
+  "Manual",
+  title = "SNPtools: Ferramentas S4 para Leitura e Organização de Dados Genéticos",
+  author = person(given = "Vinicius", family = "Junqueira", 
+                  email = "junqueiravinicius@hotmail.com", role = c("aut", "cre")),
+  year = 2025,
+  note = "R package version 0.1.0",
+  url = "https://github.com/viniciusjunqueira/SNPtools"
+)
