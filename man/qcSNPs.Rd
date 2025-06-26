@@ -13,7 +13,15 @@ qcSNPs(x, ...)
 
 \item{missing_snp}{Proporção máxima de dados faltantes permitida por SNP (opcional)}
 
+\item{min_snp_cr}{Mínimo call rate aceitável para SNPs}
+
 \item{min_maf}{Frequência alélica mínima permitida para SNPs (opcional)}
+
+\item{hwe}{Identifica SNPs com desvio de HWE}
+
+\item{snp_mono}{Identifica SNPs monomórficos}
+
+\item{remove_chr}{Descarta SNPs localizados nos cromossomos listados}
 
 \item{action}{"report", "filter" ou "both"}
 }

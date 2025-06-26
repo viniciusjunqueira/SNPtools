@@ -8,7 +8,8 @@ Maintainer: Vinicius Junqueira <junqueiravinicius@hotmail.com>
 Description: Estruturas baseadas em S4 para encapsular leitura de arquivos PLINK e FImpute com argumentos customizáveis.
 Depends: 
     R (>= 4.1.0),
-    snpStats
+    snpStats,
+    tidyverse
 Imports: 
     methods,
     data.table,
