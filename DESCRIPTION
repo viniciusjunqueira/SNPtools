@@ -11,7 +11,8 @@ Depends:
     snpStats
 Imports: 
     methods,
-    data.table
+    data.table,
+    fQC
 Suggests: 
     knitr,
     rmarkdown
