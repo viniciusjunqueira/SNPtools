@@ -26,9 +26,9 @@ qcSNPs(x, ...)
 \item{action}{"report", "filter" ou "both"}
 }
 \value{
-Dependendo do argumento `action`, retorna:
+Dependendo do argumento action, retorna:
 - "report": lista com SNPs removidos por critério;
-- "filter": objeto `SNPDataLong` com SNPs filtrados;
+- "filter": objeto SNPDataLong com SNPs filtrados;
 - "both": lista contendo o objeto filtrado e o relatório.
 }
 \description{

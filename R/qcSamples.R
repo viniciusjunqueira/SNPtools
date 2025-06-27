@@ -32,10 +32,13 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   geno <- x@geno
   map <- x@map
   
-  # Identifica duplicatas entre os nomes de amostras mantidas
+  # ⚠️ ATENÇÃO: Verifica e trata amostras duplicadas
+  # Em objetos SnpMatrix, nomes de amostras duplicados podem causar inconsistência.
+  # Aqui, mantemos apenas a primeira ocorrência de cada nome duplicado.
   dups_logical <- duplicated(rownames(geno))
   if (any(dups_logical)) {
-    message("There are duplicated rownames in SnpMatrix object. Keeping only the first occurrence.")
+    message("\n⚠️  Duplicated sample identifiers detected in the SnpMatrix object.")
+    message("   Only the first occurrence of each duplicated sample will be retained.")
     geno <- geno[!dups_logical, , drop = FALSE]
   }
 
@@ -45,7 +48,7 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   message("Applying quality control filters:")
   
   keep_samples <- rownames(geno)
-  
+
   # Calcula estatísticas por indivíduo
   sample.qc <- row.summary(geno)
 
