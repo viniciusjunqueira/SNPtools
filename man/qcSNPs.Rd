@@ -26,8 +26,25 @@ qcSNPs(x, ...)
 \item{action}{"report", "filter" ou "both"}
 }
 \value{
-Lista com sumário dos filtros e (opcionalmente) os dados filtrados
+Dependendo do argumento `action`, retorna:
+- "report": lista com SNPs removidos por critério;
+- "filter": objeto `SNPDataLong` com SNPs filtrados;
+- "both": lista contendo o objeto filtrado e o relatório.
 }
 \description{
 Permite análise de qualidade genotípica com critérios definidos pelo usuário.
+}
+\examples{
+## Not run:
+set.seed(123)
+mat <- matrix(sample(c(0, 1, 2, NA), 100, replace = TRUE, prob = c(0.4, 0.4, 0.15, 0.05)),
+              nrow = 10, ncol = 10)
+colnames(mat) <- paste0("snp", 1:10)
+rownames(mat) <- paste0("ind", 1:10)
+map <- data.frame(Name = colnames(mat), Chrom = 1, Position = 1:10)
+x <- new("SNPDataLong", geno = mat, map = map)
+
+qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, action = "report")
+## End(Not run)
+
 }
