@@ -31,10 +31,21 @@ setMethod("qcSamples", "SNPDataLong", function(x,
 
   geno <- x@geno
   map <- x@map
+  
+  # Identifica duplicatas entre os nomes de amostras mantidas
+  dups_logical <- duplicated(rownames(geno))
+  if (any(dups_logical)) {
+    message("There are duplicated rownames in SnpMatrix object. Keeping only the first occurrence.")
+    geno <- geno[!dups_logical, , drop = FALSE]
+  }
+
+  # message("Quality Control on Samples")
+  qc_header("Quality Control on Samples")
+  message("Initial number of samples: ", length(rownames(geno)))
+  message("Applying quality control filters:")
+  
   keep_samples <- rownames(geno)
-
-  message("Number of Samples before QC: ", length(keep_samples))
-
+  
   # Calcula estatísticas por indivíduo
   sample.qc <- row.summary(geno)
 
@@ -43,13 +54,15 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   if (!is.null(heterozygosity)) {
     removed_hetero <- fQC::check.sample.heterozygosity(sample.qc, heterozygosity)
     keep_samples <- setdiff(keep_samples, removed_hetero)
-    message("After heterozygosity filter: ", length(keep_samples))
+    message(sprintf("  • Heterozygosity filter: %d sample(s) removed, %d remaining.",
+                  length(removed_hetero), length(keep_samples)))
   }
 
   if (!is.null(smp_cr)) {
     removed_cr <- check.sample.call.rate(sample.qc, smp_cr)
     keep_samples <- setdiff(keep_samples, removed_cr)
-    message("After call rate filter: ", length(keep_samples))
+    message(sprintf("  • Call rate filter: %d sample(s) removed, %d remaining.",
+                  length(removed_cr), length(keep_samples)))
   }
 
   if (length(keep_samples) == 0) {
@@ -64,17 +77,9 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   #   ))
   # }
 
-  # Identifica duplicatas entre os nomes de amostras mantidas
-  dups_logical <- duplicated(rownames(geno))
-  if (any(dups_logical)) {
-    message("There are duplicated rownames in SnpMatrix object. Keeping only the first occurrence.")
-    geno <- geno[!dups_logical, , drop = FALSE]
-  }
-
   if(is.null(action)) return(x)
 
   if (action %in% c("filter", "both")) {
-    print(table(rownames(geno) %in% keep_samples))
     filtered_geno <- geno[rownames(geno) %in% keep_samples, , drop = FALSE]
 
     return(new("SNPDataLong",
