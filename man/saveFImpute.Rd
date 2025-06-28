@@ -2,13 +2,42 @@
 % Please edit documentation in R/save_fimpute.R
 \name{saveFImpute}
 \alias{saveFImpute}
-\title{Método S4 para salvar arquivos no formato FImpute}
+\alias{saveFImpute,FImputeExport-method}
+\alias{saveFImpute,SNPDataLong-method}
+\title{Save genotype and map files in FImpute format}
 \usage{
 saveFImpute(object, ...)
+
+\S4method{saveFImpute}{FImputeExport}(object, ...)
+
+\S4method{saveFImpute}{SNPDataLong}(object, path = "fimpute_run")
 }
 \arguments{
-\item{object}{Objeto da classe FImputeExport}
+\item{object}{An object of class `FImputeExport` or `SNPDataLong`.}
+
+\item{...}{Further arguments passed to methods.}
+
+\item{path}{Character. Output directory where files will be written (only for `SNPDataLong` method; default = `"fimpute_run"`).}
+}
+\value{
+No return value. Files are saved to disk.
 }
 \description{
-Método S4 para salvar arquivos no formato FImpute
+S4 method to export genotype (`.gen`), map (`.map`), and parameter (`data.par`) files compatible with the [FImpute](https://www.aps.uoguelph.ca/~msargol/fimpute/) software.
+}
+\examples{
+\dontrun{
+if (requireNamespace("snpStats", quietly = TRUE)) {
+  mat <- matrix(sample(c(0L, 1L, 2L), 50, replace = TRUE), nrow = 5)
+  colnames(mat) <- paste0("snp", 1:10)
+  rownames(mat) <- paste0("ind", 1:5)
+
+  sm <- new("SnpMatrix", data = as.raw(mat))
+  map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
+  x <- new("SNPDataLong", geno = sm, map = map)
+
+  saveFImpute(x, path = tempdir())
+}
+}
+
 }

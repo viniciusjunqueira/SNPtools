@@ -1,67 +1,120 @@
-#' Método S4 para salvar arquivos no formato FImpute
+#' @title Save genotype and map files in FImpute format
 #'
-#' @param object Objeto da classe FImputeExport
+#' @description
+#' S4 method to export genotype (`.gen`), map (`.map`), and parameter (`data.par`) files compatible with the [FImpute](https://www.aps.uoguelph.ca/~msargol/fimpute/) software.
+#'
+#' @param object An object of class `FImputeExport` or `SNPDataLong`.
+#' @param path Character. Output directory where files will be written (only for `SNPDataLong` method; default = `"fimpute_run"`).
+#' @param ... Further arguments passed to methods.
+#'
+#' @return No return value. Files are saved to disk.
+#'
+#' @examples
+#' \dontrun{
+#' if (requireNamespace("snpStats", quietly = TRUE)) {
+#'   mat <- matrix(sample(c(0L, 1L, 2L), 50, replace = TRUE), nrow = 5)
+#'   colnames(mat) <- paste0("snp", 1:10)
+#'   rownames(mat) <- paste0("ind", 1:5)
+#'
+#'   sm <- new("SnpMatrix", data = as.raw(mat))
+#'   map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
+#'   x <- new("SNPDataLong", geno = sm, map = map)
+#'
+#'   saveFImpute(x, path = tempdir())
+#' }
+#' }
+#'
 #' @export
 setGeneric("saveFImpute", function(object, ...) standardGeneric("saveFImpute"))
 
+#' @rdname saveFImpute
 #' @export
 setMethod("saveFImpute", "FImputeExport", function(object, ...) {
-  save_fimpute_raw(object@geno, object@map, object@path, object@name)
+  save_fimpute_raw(object@geno, object@map, object@path)
 })
 
-#' Exporta genótipos e mapa no formato FImpute a partir de argumentos simples
-#'
-#' @param geno Objeto do tipo SnpMatrix (do pacote snpStats)
-#' @param map Data frame com colunas 'Name', 'Chromosome' e 'Position'
-#' @param path Caminho onde os arquivos serão salvos
-#' @param name Nome base para os arquivos de saída
-#'
+#' @rdname saveFImpute
 #' @export
-saveFImputeRaw <- function(geno, map, path, name) {
-  export <- new("FImputeExport", geno = geno, map = map, path = path, name = name)
+setMethod("saveFImpute", "SNPDataLong", function(object, path = "fimpute_run") {
+  if (!requireNamespace("snpStats", quietly = TRUE)) {
+    stop("The 'snpStats' package is required. Please install it with install.packages('snpStats').")
+  }
+
+  if (!inherits(object@geno, "SnpMatrix")) {
+    stop("The 'geno' slot of the object must be of class 'SnpMatrix'.")
+  }
+
+  if (!is.data.frame(object@map)) {
+    stop("The 'map' slot of the object must be a data.frame.")
+  }
+
+  fimpute_export <- new("FImputeExport",
+                        geno = object@geno,
+                        map = object@map,
+                        path = path)
+
+  saveFImpute(fimpute_export)
+})
+
+#' @title Export genotypes and map using basic arguments
+#'
+#' @description
+#' Convenience function to export FImpute files directly from a `SnpMatrix` and map `data.frame`.
+#'
+#' @param geno A `SnpMatrix` object (from the `snpStats` package).
+#' @param map A `data.frame` with columns 'Name', 'Chromosome', and 'Position'.
+#' @param path Path where the files will be saved.
+#'
+#' @return No return value. Files are saved to disk.
+#' @export
+saveFImputeRaw <- function(geno, map, path) {
+  export <- new("FImputeExport", geno = geno, map = map, path = path)
   saveFImpute(export)
 }
 
-#' Função interna: salva os arquivos .gen e .map no formato FImpute
+#' Internal function: writes files in FImpute format (.gen, .map, data.par)
 #'
 #' @noRd
-save_fimpute_raw <- function(genotype, map, caminho, name) {
+save_fimpute_raw <- function(genotype, map, caminho) {
   if (!requireNamespace("snpStats", quietly = TRUE)) {
-    stop("O pacote 'snpStats' é necessário. Instale com install.packages('snpStats').")
+    stop("The 'snpStats' package is required. Please install it with install.packages('snpStats').")
   }
 
   if (!inherits(genotype, "SnpMatrix")) {
-    stop("O objeto 'genotype' deve ser da classe 'SnpMatrix'.")
+    stop("The 'genotype' object must be of class 'SnpMatrix'.")
   }
 
   if (!is.data.frame(map)) {
-    stop("'map' deve ser um data.frame.")
+    stop("The 'map' argument must be a data.frame.")
   }
 
   required_cols <- c("Name", "Chromosome", "Position")
   missing_cols <- setdiff(required_cols, colnames(map))
   if (length(missing_cols) > 0) {
-    stop("O mapa está faltando as colunas obrigatórias: ", paste(missing_cols, collapse = ", "))
+    stop("The map is missing required columns: ", paste(missing_cols, collapse = ", "))
   }
 
   if (!is.character(caminho) || length(caminho) != 1) {
-    stop("'caminho' deve ser uma string indicando o diretório de saída.")
-  }
-
-  if (!is.character(name) || length(name) != 1) {
-    stop("'name' deve ser uma string para o nome base dos arquivos.")
+    stop("'caminho' must be a single character string indicating the output directory.")
   }
 
   if (!dir.exists(caminho)) {
+    message("Creating output directory: ", caminho)
     dir.create(caminho, recursive = TRUE)
+  } else {
+    existing_files <- list.files(caminho, pattern = "data\\.(gen|map|par)$", full.names = TRUE)
+    if (length(existing_files) > 0) {
+      warning("The following files will be overwritten:\n  ",
+              paste(basename(existing_files), collapse = "\n  "))
+    }
   }
 
-  # --- Arquivo .gen ---
-  gen_file <- file.path(caminho, paste0(name, ".gen"))
+  ## Write .gen file
+  gen_file <- file.path(caminho, "data.gen")
   con <- file(gen_file, "wt")
 
   smp <- rownames(genotype)
-  if (is.null(smp)) stop("O objeto 'genotype' deve ter nomes de linha (indivíduos).")
+  if (is.null(smp)) stop("The 'genotype' object must have row names (individual IDs).")
 
   nC <- max(nchar(smp), na.rm = TRUE)
   writeLines("ID    Chip                   Call...", con)
@@ -77,14 +130,15 @@ save_fimpute_raw <- function(genotype, map, caminho, name) {
   }
 
   close(con)
+  message("✔ File written: ", gen_file)
 
-  # --- Arquivo .map ---
-  map_file <- file.path(caminho, paste0(name, ".map"))
+  ## Write .map file
+  map_file <- file.path(caminho, "data.map")
   write("SNP_ID           Chr      Pos   Chip1", file = map_file)
 
   map <- map[map$Name %in% colnames(genotype), ]
   if (nrow(map) == 0) {
-    warning("Nenhum SNP do mapa corresponde às colunas do genótipo.")
+    warning("No SNPs in the map matched the columns in the genotype object.")
   }
 
   map_out <- data.frame(map[, required_cols, drop = FALSE], 1:nrow(map))
@@ -97,39 +151,20 @@ save_fimpute_raw <- function(genotype, map, caminho, name) {
     sep = " ",
     append = TRUE
   )
+  message("✔ File written: ", map_file)
+
+  ## Write data.par file
+  par_file <- file.path(caminho, "fimpute.par")
+  writeLines(c(
+    'title="FImpute imputation";',
+    'genotype_file="data.gen";',
+    'snp_info_file="data.map";',
+    'parentage_test /ert_mm=0.02 /remove_conflict /find_match_cnflt /find_match_mp /find_match_ugp;',
+    'output_folder="output_fimpute";',
+    'save_genotype;',
+    'njob=24;'
+  ), con = par_file)
+  message("✔ File written: ", par_file)
 
   invisible(NULL)
 }
-
-#' Exporta genótipos e mapa de um objeto SNPDataLong no formato FImpute
-#'
-#' Esta função cria internamente um objeto da classe FImputeExport e exporta os arquivos `.gen` e `.map`.
-#'
-#' @param object Objeto da classe `SNPDataLong`
-#' @param path Diretório onde os arquivos serão salvos (default = "fimpute_run")
-#' @param name Nome base dos arquivos gerados (default = "gen_data")
-#'
-#' @return NULL (arquivos são salvos no disco)
-#' @export
-setMethod("saveFImpute", "SNPDataLong", function(object, path = "fimpute_run", name = "gen_data") {
-  # --- Validações ---
-  if (!requireNamespace("snpStats", quietly = TRUE)) {
-    stop("O pacote 'snpStats' é necessário. Instale com install.packages('snpStats').")
-  }
-
-  if (!inherits(object@geno, "SnpMatrix")) {
-    stop("O slot 'geno' do objeto precisa ser da classe 'SnpMatrix'.")
-  }
-
-  if (!is.data.frame(object@map)) {
-    stop("O slot 'map' do objeto precisa ser um data.frame.")
-  }
-
-  fimpute_export <- new("FImputeExport",
-                        geno = object@geno,
-                        map = object@map,
-                        path = path,
-                        name = name)
-
-  saveFImpute(fimpute_export)
-})

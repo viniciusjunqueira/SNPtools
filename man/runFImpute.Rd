@@ -2,17 +2,20 @@
 % Please edit documentation in R/fimpute_runner.R
 \name{runFImpute}
 \alias{runFImpute}
-\title{Executa o FImpute a partir de um objeto FImputeRunner}
+\alias{runFImpute,FImputeRunner-method}
+\title{Run FImpute from a FImputeRunner object}
 \usage{
 runFImpute(object)
+
+\S4method{runFImpute}{FImputeRunner}(object)
 }
 \arguments{
-\item{object}{Objeto da classe FImputeRunner}
+\item{object}{An object of class `FImputeRunner`}
 }
 \value{
-Objeto FImputeRunner com o slot `results` preenchido
+An updated `FImputeRunner` object with the `results` slot populated.
 }
 \description{
-Esta função executa o software externo FImpute a partir de um objeto da classe FImputeRunner,
-garantindo que os arquivos necessários estejam disponíveis e que os resultados possam ser lidos.
+This function runs the external FImpute software using a `FImputeRunner` object,
+ensuring that all required input files are present and the results are imported.
 }
