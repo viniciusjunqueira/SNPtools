@@ -2,16 +2,37 @@
 % Please edit documentation in R/combinar.R
 \name{combinarSNPData}
 \alias{combinarSNPData}
-\title{Combina múltiplos objetos SNPDataLong (painéis diferentes)}
+\title{Combine multiple SNPDataLong objects}
 \usage{
 combinarSNPData(lista)
 }
 \arguments{
-\item{lista}{Lista de objetos da classe SNPDataLong}
+\item{lista}{A list of \code{SNPDataLong} objects to be combined.}
 }
 \value{
-Objeto SNPDataLong unificado
+A single \code{SNPDataLong} object containing the combined genotype matrix, merged map,
+and a concatenated path string.
 }
 \description{
-Combina múltiplos objetos SNPDataLong (painéis diferentes)
+This function merges a list of \code{SNPDataLong} objects, typically representing different SNP panels 
+or datasets, into a single unified \code{SNPDataLong} object. It ensures that all genotype matrices
+have the same set of SNPs (filling missing SNPs with NA), and merges the marker map information while
+removing duplicate SNP entries.
+}
+\details{
+The function performs the following steps internally:
+\enumerate{
+  \item Computes the union of all SNPs across input objects.
+  \item Fills missing SNP columns in each genotype matrix with NA-coded columns.
+  \item Combines genotype matrices by rows (individuals).
+  \item Merges marker maps, removing duplicates (retaining the first occurrence).
+  \item Creates and returns a new \code{SNPDataLong} object with the combined data.
+}
+}
+\examples{
+\dontrun{
+# Example usage:
+combined_data <- combinarSNPData(list(snp_data1, snp_data2, snp_data3))
+}
+
 }

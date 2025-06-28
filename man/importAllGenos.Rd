@@ -2,16 +2,17 @@
 % Please edit documentation in R/getGeno.R
 \name{importAllGenos}
 \alias{importAllGenos}
-\title{Importa e combina múltiplas configurações de genótipos}
+\title{Import and combine multiple genotype configurations}
 \usage{
 importAllGenos(object)
 }
 \arguments{
-\item{object}{Objeto do tipo SNPImportList}
+\item{object}{An object of class \code{SNPImportList} containing import configurations}
 }
 \value{
-Objeto SNPDataLong combinado
+A single combined \code{SNPDataLong} object
 }
 \description{
-Importa e combina múltiplas configurações de genótipos
+This generic and method import genotype data from multiple configurations defined in an
+\code{SNPImportList} object, then combine them into a single unified \code{SNPDataLong} object.
 }
