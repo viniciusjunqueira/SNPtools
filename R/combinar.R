@@ -1,48 +1,68 @@
-#' Combina múltiplos objetos SNPDataLong (painéis diferentes)
+#' Combine multiple SNPDataLong objects
 #'
-#' @param lista Lista de objetos da classe SNPDataLong
+#' This function merges a list of \code{SNPDataLong} objects, typically representing different SNP panels 
+#' or datasets, into a single unified \code{SNPDataLong} object. It ensures that all genotype matrices
+#' have the same set of SNPs (filling missing SNPs with NA), and merges the marker map information while
+#' removing duplicate SNP entries.
 #'
-#' @return Objeto SNPDataLong unificado
+#' @param lista A list of \code{SNPDataLong} objects to be combined.
+#'
+#' @return A single \code{SNPDataLong} object containing the combined genotype matrix, merged map,
+#' and a concatenated path string.
+#'
+#' @details
+#' The function performs the following steps internally:
+#' \enumerate{
+#'   \item Computes the union of all SNPs across input objects.
+#'   \item Fills missing SNP columns in each genotype matrix with NA-coded columns.
+#'   \item Combines genotype matrices by rows (individuals).
+#'   \item Merges marker maps, removing duplicates (retaining the first occurrence).
+#'   \item Creates and returns a new \code{SNPDataLong} object with the combined data.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage:
+#' combined_data <- combinarSNPData(list(snp_data1, snp_data2, snp_data3))
+#' }
+#'
 #' @export
 combinarSNPData <- function(lista) {
   stopifnot(length(lista) > 0)
 
-  # União de todos os SNPs
-  snps_todos <- Reduce(union, lapply(lista, function(x) colnames(x@geno)))
+  # Get the union of all SNP names across all objects
+  snps_all <- Reduce(union, lapply(lista, function(x) colnames(x@geno)))
 
-  # Preenche cada geno com todos os SNPs (NA onde não existir)
+  # Ensure each genotype matrix has all SNPs (fill with NAs where missing)
   geno_list <- lapply(lista, function(x) {
     geno <- x@geno
-    ausentes <- setdiff(snps_todos, colnames(geno))
-    if (length(ausentes) > 0) {
-      # Cria SnpMatrix de NAs para os SNPs ausentes
-      na_block <- new("SnpMatrix", matrix(as.raw(0), nrow = nrow(geno), ncol = length(ausentes)))
-      colnames(na_block) <- ausentes
+    missing_snps <- setdiff(snps_all, colnames(geno))
+    if (length(missing_snps) > 0) {
+      # Create a SnpMatrix of NAs for missing SNPs
+      na_block <- new("SnpMatrix", matrix(as.raw(0), nrow = nrow(geno), ncol = length(missing_snps)))
+      colnames(na_block) <- missing_snps
       geno <- cbind(geno, na_block)
     }
-    # Reordena colunas para manter a mesma ordem
-    geno[, snps_todos, drop = FALSE]
+    # Reorder columns to maintain consistent SNP order
+    geno[, snps_all, drop = FALSE]
   })
 
-  # Junta os genótipos
+  # Combine genotype matrices row-wise
   geno_comb <- do.call(rbind, geno_list)
 
-  # Junta informações FAM
-#   fam_comb <- do.call(rbind, lapply(lista, function(x) x@fam))
-
-  # Junta mapas e remove SNPs duplicados mantendo primeiro
+  # Combine marker maps and remove duplicate SNPs, keeping the first occurrence
   map_all <- do.call(rbind, lapply(lista, function(x) x@map))
   map_all <- map_all[!duplicated(map_all$Name), , drop = FALSE]
-  map_final <- map_all[match(snps_todos, map_all$Name), , drop = FALSE]
+  map_final <- map_all[match(snps_all, map_all$Name), , drop = FALSE]
 
-  # Validação final
+  # Final validation and type coercion if needed
   if (!inherits(geno_comb, "SnpMatrix")) {
     geno_comb <- methods::as(geno_comb, "SnpMatrix")
   }
 
+  # Create and return the combined SNPDataLong object
   new("SNPDataLong",
       geno = geno_comb,
-    #   fam  = fam_comb,
       map  = map_final,
       path = paste(sapply(lista, function(x) x@path), collapse = ";"))
 }

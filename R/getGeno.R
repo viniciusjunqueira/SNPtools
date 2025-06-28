@@ -1,15 +1,19 @@
-#' Leitura flexível e eficiente de genótipos com autodetecção usando fread
+#' Flexible and efficient genotype file reading with autodetection using fread
 #'
-#' @param path Caminho para o FinalReport.txt
-#' @param fields Lista com as colunas: sample, snp, allele1, allele2, confidence
-#' @param codes Vetor com os códigos de alelos (ex: c("A", "B"))
-#' @param threshold Corte para qualidade (confidence)
-#' @param sep Separador usado no arquivo
-#' @param skip Linhas a pular no topo
-#' @param verbose Exibir progresso?
-#' @param every Frequência de progresso
+#' This generic and method allow flexible import of SNP genotype data from Illumina FinalReport files,
+#' supporting fast initial column detection using \code{data.table::fread}, followed by full genotype
+#' matrix construction via \code{snpStats::read.snps.long}.
 #'
-#' @return Objeto da classe SNPDataLong ou NULL em caso de erro
+#' @param path Path to the directory containing \code{FinalReport.txt}
+#' @param fields A list specifying column indices for sample, SNP, allele1, allele2, and confidence
+#' @param codes A character vector with allele codes (e.g., \code{c("A", "B")})
+#' @param threshold Confidence threshold for genotype calling
+#' @param sep Field separator used in the files
+#' @param skip Number of lines to skip at the start of the file
+#' @param verbose Logical; if \code{TRUE}, displays progress messages
+#' @param every Frequency of progress update (number of SNPs)
+#'
+#' @return An \code{SNPDataLong} object containing the genotype matrix and map, or \code{NULL} if an error occurs
 #' @export
 setGeneric("getGeno", function(...) standardGeneric("getGeno"))
 
@@ -24,15 +28,15 @@ setMethod("getGeno", signature(),
            every = NULL) {
 
     if (!requireNamespace("data.table", quietly = TRUE)) {
-      stop("O pacote 'data.table' é necessário. Instale com install.packages('data.table').")
+      stop("The 'data.table' package is required. Install it using install.packages('data.table').")
     }
 
     if (!file.exists(file.path(path, "FinalReport.txt"))) {
-      warning("Arquivo FinalReport.txt não encontrado em: ", path)
+      warning("File FinalReport.txt not found at: ", path)
       return(NULL)
     }
 
-    # Leitura rápida com fread
+    # Fast initial read using fread to detect samples and SNPs
     cols_to_read <- unique(unlist(fields[c("sample", "snp")]))
     col_select <- as.integer(cols_to_read)
 
@@ -47,7 +51,7 @@ setMethod("getGeno", signature(),
         colClasses = "character"
       )
     }, error = function(e) {
-      warning("Falha ao ler FinalReport.txt com fread: ", e$message)
+      warning("Failed to read FinalReport.txt with fread: ", e$message)
       return(NULL)
     })
 
@@ -61,7 +65,7 @@ setMethod("getGeno", signature(),
 
     if (is.null(every)) every <- length(snp.id)
 
-    # Leitura com snpStats
+    # Full genotype matrix reading with snpStats
     data <- tryCatch({
       snpStats::read.snps.long(
         file = file.path(path, "FinalReport.txt"),
@@ -76,23 +80,23 @@ setMethod("getGeno", signature(),
         every = every
       )
     }, error = function(e) {
-      warning("Erro ao executar read.snps.long: ", e$message)
+      warning("Error while running read.snps.long: ", e$message)
       return(NULL)
     })
 
     if (is.null(data)) return(NULL)
 
-    # Leitura do mapa
+    # Read map file
     map_file <- file.path(path, "SNP_Map.txt")
     if (!file.exists(map_file)) {
-      warning("Arquivo SNP_Map.txt não encontrado em: ", path)
+      warning("SNP_Map.txt file not found at: ", path)
       return(NULL)
     }
 
     map <- tryCatch({
       read.table(map_file, colClasses = "character", sep = sep, header = TRUE)
     }, error = function(e) {
-      warning("Erro ao ler SNP_Map.txt: ", e$message)
+      warning("Error reading SNP_Map.txt: ", e$message)
       return(NULL)
     })
 
@@ -107,23 +111,26 @@ setMethod("getGeno", signature(),
   }
 )
 
-#' Importa e combina múltiplas configurações de genótipos
+#' Import and combine multiple genotype configurations
 #'
-#' @param object Objeto do tipo SNPImportList
+#' This generic and method import genotype data from multiple configurations defined in an
+#' \code{SNPImportList} object, then combine them into a single unified \code{SNPDataLong} object.
 #'
-#' @return Objeto SNPDataLong combinado
+#' @param object An object of class \code{SNPImportList} containing import configurations
+#'
+#' @return A single combined \code{SNPDataLong} object
 #' @export
 setGeneric("importAllGenos", function(object) standardGeneric("importAllGenos"))
 
 setMethod("importAllGenos", "SNPImportList", function(object) {
   all_genos <- lapply(object@configs, function(cfg) {
     tryCatch(getGeno(cfg), error = function(e) {
-      warning("Erro em getGeno(): ", e$message)
+      warning("Error in getGeno(): ", e$message)
       NULL
     })
   })
 
   all_genos <- Filter(Negate(is.null), all_genos)
-  if (length(all_genos) == 0) stop("Nenhum genótipo foi importado com sucesso.")
+  if (length(all_genos) == 0) stop("No genotype data was successfully imported.")
   combinarSNPData(all_genos)
 })
