@@ -21,3 +21,9 @@ A ggplot object (also prints to screen).
 \description{
 Plot PCA groups from anticlustering result
 }
+\examples{
+\dontrun{
+res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
+plotPCAgroups(res$pca, res$groups)
+}
+}

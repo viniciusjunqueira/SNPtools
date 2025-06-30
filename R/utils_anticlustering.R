@@ -8,6 +8,12 @@
 #' @param scale Logical or numeric. If TRUE (default FALSE), scale columns to standard deviation one.
 #'
 #' @return A data.frame with individuals as rows and SNPs as columns (numeric 0/1/2, or centered/scaled values).
+#'
+#' @examples
+#' \dontrun{
+#' df <- genoToDF(nelore_imputed, center = TRUE, scale = TRUE)
+#' head(df[, 1:5])
+#' }
 #' @export
 genoToDF <- function(object, center = FALSE, scale = FALSE) {
   if (!inherits(object, "SNPDataLong")) {
@@ -33,7 +39,7 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 
 #' Run PCA and Anticlustering on SNPDataLong
 #'
-#' Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering.
+#' Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering grouping.
 #'
 #' @param object An object of class SNPDataLong.
 #' @param K Number of groups for anticlustering.
@@ -45,30 +51,31 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #' - groups: vector with group assignments.
 #' - pca: the PCA result object (prcomp).
 #' - pcs: matrix of top PCs used in anticlustering.
+#'
+#' @examples
+#' \dontrun{
+#' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
+#' table(res$groups)
+#' }
 #' @export
 runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
   if (!inherits(object, "SNPDataLong")) {
     stop("❌ Input object must be of class SNPDataLong.")
   }
 
-  # Convert and optionally scale/center
   geno_df <- genoToDF(object, center = center, scale = scale)
   cat("✅ Genotype data frame created for PCA.\n")
 
-  # Run PCA
   cat("⚡ Running PCA...\n")
   pca_res <- prcomp(geno_df, center = FALSE, scale. = FALSE)
 
-  # Select top PCs
   top_pcs <- pca_res$x[, seq_len(n_pcs)]
   cat("✅ Top", n_pcs, "PCs extracted.\n")
 
-  # Run anticlustering
   cat("⚖️ Running anticlustering with", K, "groups...\n")
   groups <- fast_anticlustering(top_pcs, K = K)
   cat("✅ Anticlustering completed. Groups assigned.\n")
 
-  # Return as a list
   return(list(
     groups = groups,
     pca = pca_res,
@@ -84,33 +91,35 @@ runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale
 #' @param filename Optional. If provided, saves plot to this file (e.g., "antic.png").
 #'
 #' @return A ggplot object (also prints to screen).
+#'
+#' @examples
+#' \dontrun{
+#' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
+#' plotPCAgroups(res$pca, res$groups)
+#' }
 #' @export
 plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
-  # Calculate % variance explained
   explained_var <- pca_res$sdev^2 / sum(pca_res$sdev^2)
   pc1_var <- round(100 * explained_var[pcs[1]], 2)
   pc2_var <- round(100 * explained_var[pcs[2]], 2)
   
-  # Create data frame
   pc_df <- data.frame(
     PC1 = pca_res$x[, pcs[1]],
     PC2 = pca_res$x[, pcs[2]],
     Group = as.factor(groups)
   )
   
-  # Create plot
   p <- ggplot(pc_df, aes(x = PC1, y = PC2, color = Group)) +
     geom_point(size = 2, alpha = 0.8) +
     labs(
       title = "PCA plot colored by Anticlustering Group",
       x = paste0("PC", pcs[1], " (", pc1_var, "%)"),
-      y = paste0("PC", pcs[2], " (", pc2_var, "%)")
+      y = paste0("PC", pcs[2], "%)")
     ) +
     theme_minimal() +
     theme(legend.position = "right")
-    p <- p + theme(plot.background = element_rect(fill = "white", color = NA))
+  p <- p + theme(plot.background = element_rect(fill = "white", color = NA))
 
-  # Save or print
   if (!is.null(filename)) {
     ggsave(filename, p, width = 7, height = 5)
     cat("✅ Plot saved to:", filename, "\n")

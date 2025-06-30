@@ -24,5 +24,11 @@ A list with:
 - pcs: matrix of top PCs used in anticlustering.
 }
 \description{
-Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering.
+Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering grouping.
+}
+\examples{
+\dontrun{
+res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
+table(res$groups)
+}
 }

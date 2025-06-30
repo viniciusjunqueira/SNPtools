@@ -20,3 +20,9 @@ A data.frame with individuals as rows and SNPs as columns (numeric 0/1/2, or cen
 Converts the genotype matrix (geno slot) of a SNPDataLong object to a data.frame,
 with optional centering and scaling per SNP (column).
 }
+\examples{
+\dontrun{
+df <- genoToDF(nelore_imputed, center = TRUE, scale = TRUE)
+head(df[, 1:5])
+}
+}
