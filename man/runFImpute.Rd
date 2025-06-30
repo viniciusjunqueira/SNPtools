@@ -5,17 +5,41 @@
 \alias{runFImpute,FImputeRunner-method}
 \title{Run FImpute from a FImputeRunner object}
 \usage{
-runFImpute(object)
+runFImpute(object, verbose = TRUE)
 
-\S4method{runFImpute}{FImputeRunner}(object)
+\S4method{runFImpute}{FImputeRunner}(object, verbose = TRUE)
 }
 \arguments{
-\item{object}{An object of class `FImputeRunner`}
+\item{object}{An object of class `FImputeRunner`.}
+
+\item{verbose}{Logical. If TRUE (default), FImpute output will be printed to the console.}
 }
 \value{
-An updated `FImputeRunner` object with the `results` slot populated.
+An updated `FImputeRunner` object with the `results` slot populated (SnpMatrix).
 }
 \description{
 This function runs the external FImpute software using a `FImputeRunner` object,
 ensuring that all required input files are present and the results are imported.
+}
+\examples{
+\dontrun{
+# Example: Running FImpute from a FImputeRunner object
+
+path_fimpute <- "fimpute_run_example"
+param_file <- file.path(path_fimpute, "fimpute.par")
+fimpute_exec <- "FImpute3"  # assuming it is in PATH
+
+export_obj <- new("FImputeExport",
+                  geno = geno_obj@geno,
+                  map = geno_obj@map,
+                  path = path_fimpute)
+
+runner <- new("FImputeRunner",
+              export = export_obj,
+              par_file = param_file,
+              exec_path = fimpute_exec)
+
+runner <- runFImpute(runner, verbose = TRUE)
+head(runner@results)
+}
 }

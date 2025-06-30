@@ -10,7 +10,11 @@
 #'
 #' @return An object of class `FImputeRunner`.
 #' @export
-FImputeRunner <- function(geno, map, path, exec_path = "FImpute3", name = "data") {
+FImputeRunner <- function(object, path, exec_path = "FImpute3", name = "data") {
+  
+  geno = object@geno
+  map = object@map
+  
   export <- new("FImputeExport", geno = geno, map = map, path = path, name = name)
   par_file <- file.path(path, "fimpute.par")
   runner <- new("FImputeRunner", export = export, par_file = par_file, exec_path = exec_path, results = data.frame())

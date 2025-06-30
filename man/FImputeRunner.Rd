@@ -4,18 +4,18 @@
 \alias{FImputeRunner}
 \title{Build FImputeRunner object}
 \usage{
-FImputeRunner(geno, map, path, exec_path = "FImpute3", name = "data")
+FImputeRunner(object, path, exec_path = "FImpute3", name = "data")
 }
 \arguments{
-\item{geno}{A SnpMatrix object.}
-
-\item{map}{A data.frame with SNP metadata (columns: Name, Chromosome, Position).}
-
 \item{path}{A character string indicating the directory to save FImpute files.}
 
 \item{exec_path}{Path to the FImpute executable (default = "FImpute3").}
 
 \item{name}{Name for the dataset (used internally, default = "gen_data").}
+
+\item{geno}{A SnpMatrix object.}
+
+\item{map}{A data.frame with SNP metadata (columns: Name, Chromosome, Position).}
 }
 \value{
 An object of class `FImputeRunner`.

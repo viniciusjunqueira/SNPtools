@@ -29,13 +29,13 @@ setGeneric("saveFImpute", function(object, ...) standardGeneric("saveFImpute"))
 
 #' @rdname saveFImpute
 #' @export
-setMethod("saveFImpute", "FImputeExport", function(object, ...) {
+setMethod("saveFImpute", "FImputeExport", function(object) {
   save_fimpute_raw(object@geno, object@map, object@path)
 })
 
 #' @rdname saveFImpute
 #' @export
-setMethod("saveFImpute", "SNPDataLong", function(object, path = "fimpute_run") {
+setMethod("saveFImpute", "SNPDataLong", function(object, path = NULL) {
   if (!requireNamespace("snpStats", quietly = TRUE)) {
     stop("The 'snpStats' package is required. Please install it with install.packages('snpStats').")
   }
@@ -46,6 +46,10 @@ setMethod("saveFImpute", "SNPDataLong", function(object, path = "fimpute_run") {
 
   if (!is.data.frame(object@map)) {
     stop("The 'map' slot of the object must be a data.frame.")
+  }
+
+  if(is.null(path)) {
+    path = 'fimpute_run'
   }
 
   fimpute_export <- new("FImputeExport",
@@ -75,7 +79,7 @@ saveFImputeRaw <- function(geno, map, path) {
 #' Internal function: writes files in FImpute format (.gen, .map, data.par)
 #'
 #' @noRd
-save_fimpute_raw <- function(genotype, map, caminho) {
+save_fimpute_raw <- function(genotype, map, path) {
   if (!requireNamespace("snpStats", quietly = TRUE)) {
     stop("The 'snpStats' package is required. Please install it with install.packages('snpStats').")
   }
@@ -94,15 +98,15 @@ save_fimpute_raw <- function(genotype, map, caminho) {
     stop("The map is missing required columns: ", paste(missing_cols, collapse = ", "))
   }
 
-  if (!is.character(caminho) || length(caminho) != 1) {
-    stop("'caminho' must be a single character string indicating the output directory.")
+  if (!is.character(path) || length(path) != 1) {
+    stop("'path' must be a single character string indicating the output directory.")
   }
 
-  if (!dir.exists(caminho)) {
-    message("Creating output directory: ", caminho)
-    dir.create(caminho, recursive = TRUE)
+  if (!dir.exists(path)) {
+    message("Creating output directory: ", path)
+    dir.create(path, recursive = TRUE)
   } else {
-    existing_files <- list.files(caminho, pattern = "data\\.(gen|map|par)$", full.names = TRUE)
+    existing_files <- list.files(path, pattern = "data\\.(gen|map|par)$", full.names = TRUE)
     if (length(existing_files) > 0) {
       warning("The following files will be overwritten:\n  ",
               paste(basename(existing_files), collapse = "\n  "))
@@ -110,7 +114,7 @@ save_fimpute_raw <- function(genotype, map, caminho) {
   }
 
   ## Write .gen file
-  gen_file <- file.path(caminho, "data.gen")
+  gen_file <- file.path(path, "data.gen")
   con <- file(gen_file, "wt")
 
   smp <- rownames(genotype)
@@ -133,7 +137,7 @@ save_fimpute_raw <- function(genotype, map, caminho) {
   message("✔ File written: ", gen_file)
 
   ## Write .map file
-  map_file <- file.path(caminho, "data.map")
+  map_file <- file.path(path, "data.map")
   write("SNP_ID           Chr      Pos   Chip1", file = map_file)
 
   map <- map[map$Name %in% colnames(genotype), ]
@@ -154,7 +158,7 @@ save_fimpute_raw <- function(genotype, map, caminho) {
   message("✔ File written: ", map_file)
 
   ## Write data.par file
-  par_file <- file.path(caminho, "fimpute.par")
+  par_file <- file.path(path, "fimpute.par")
   writeLines(c(
     'title="FImpute imputation";',
     'genotype_file="data.gen";',

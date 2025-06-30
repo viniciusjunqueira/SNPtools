@@ -8,9 +8,9 @@
 \usage{
 saveFImpute(object, ...)
 
-\S4method{saveFImpute}{FImputeExport}(object, ...)
+\S4method{saveFImpute}{FImputeExport}(object)
 
-\S4method{saveFImpute}{SNPDataLong}(object, path = "fimpute_run")
+\S4method{saveFImpute}{SNPDataLong}(object, path = NULL)
 }
 \arguments{
 \item{object}{An object of class `FImputeExport` or `SNPDataLong`.}

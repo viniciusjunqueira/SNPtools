@@ -1,0 +1,24 @@
+--------------------------- Parentage Test ---------------------------
+Error rate threshold for mismatch   : 0.02
+Error rate threshold for match      : 0.005
+A: individual call rate
+B: Sire call rate
+C: Dam call rate
+D: No. Mendelian inconsistencies
+E: No. loci compared
+
+ID                   Sire                 Dam                  Check  A      B      C      D       E       Possible match       D       E      
+DRAGON               0                    0                    Dam    0.997  0.000  0.000  -       -       L389                 31      193292 
+EMBRA078             0                    0                    Dam    1.000  0.000  0.000  -       -       EMBRA079             13      193809 
+EMBRA111             0                    0                    Dam    1.000  0.000  0.000  -       -       EMBRA125             22      193685 
+EMBRA119             0                    0                    Dam    1.000  0.000  0.000  -       -       EMBRA139             18      193816 
+K429                 0                    0                    Dam    0.883  0.000  0.000  -       -       K431                 1       171078 
+K452                 0                    0                    Dam    1.000  0.000  0.000  -       -       L530                 17      193826 
+L353                 0                    0                    Dam    1.000  0.000  0.000  -       -       SPARTACUS            42      193799 
+L359                 0                    0                    Dam    1.000  0.000  0.000  -       -       ROBUSTO              24      193808 
+L366                 0                    0                    Dam    1.000  0.000  0.000  -       -       SPARTACUS            29      193809 
+L369                 0                    0                    Dam    1.000  0.000  0.000  -       -       ROBUSTO              26      193808 
+L373                 0                    0                    Dam    1.000  0.000  0.000  -       -       ROBUSTO              25      193805 
+L374                 0                    0                    Dam    1.000  0.000  0.000  -       -       ROBUSTO              19      193798 
+L378                 0                    0                    Dam    0.999  0.000  0.000  -       -       ROBUSTO              27      193637 
+

@@ -1,0 +1,7 @@
+title="FImpute imputation";
+genotype_file="data.gen";
+snp_info_file="data.map";
+parentage_test /ert_mm=0.02 /remove_conflict /find_match_cnflt /find_match_mp /find_match_ugp;
+output_folder="output_fimpute";
+save_genotype;
+njob=24;

@@ -2,40 +2,42 @@
 % Please edit documentation in R/qcSNPs.R
 \name{qcSNPs}
 \alias{qcSNPs}
-\title{Controle de Qualidade para SNPDataLong com critérios opcionais}
+\title{Quality Control for SNPDataLong with optional criteria}
 \usage{
 qcSNPs(x, ...)
 }
 \arguments{
-\item{x}{Objeto da classe SNPDataLong}
+\item{x}{An object of class SNPDataLong.}
 
-\item{missing_ind}{Proporção máxima de dados faltantes permitida por indivíduo (opcional)}
+\item{missing_ind}{Maximum allowed proportion of missing data per individual (optional). *[Currently not implemented in this function]*}
 
-\item{missing_snp}{Proporção máxima de dados faltantes permitida por SNP (opcional)}
+\item{missing_snp}{Maximum allowed proportion of missing data per SNP (optional). *[Currently not implemented in this function]*}
 
-\item{min_snp_cr}{Mínimo call rate aceitável para SNPs}
+\item{min_snp_cr}{Minimum acceptable call rate for SNPs.}
 
-\item{min_maf}{Frequência alélica mínima permitida para SNPs (opcional)}
+\item{min_maf}{Minimum minor allele frequency allowed for SNPs (optional).}
 
-\item{hwe}{Identifica SNPs com desvio de HWE}
+\item{hwe}{p-value threshold for Hardy-Weinberg equilibrium test (optional).}
 
-\item{snp_mono}{Identifica SNPs monomórficos}
+\item{snp_position}{Logical. If TRUE, removes SNPs mapped to the same position, keeping the one with the highest MAF.}
 
-\item{remove_chr}{Descarta SNPs localizados nos cromossomos listados}
+\item{snp_mono}{Logical. If TRUE, identifies and removes monomorphic SNPs.}
 
-\item{action}{"report", "filter" ou "both"}
+\item{remove_chr}{Character vector of chromosomes to exclude (optional).}
+
+\item{action}{One of "report" (returns a list of removed SNPs), "filter" (returns a filtered SNPDataLong object), or "both" (returns both).}
 }
 \value{
-Dependendo do argumento action, retorna:
-- "report": lista com SNPs removidos por critério;
-- "filter": objeto SNPDataLong com SNPs filtrados;
-- "both": lista contendo o objeto filtrado e o relatório.
+Depending on the action argument:
+- "report": list with SNPs removed by each criterion and SNPs kept.
+- "filter": filtered SNPDataLong object.
+- "both": list with the filtered object and detailed report.
 }
 \description{
-Permite análise de qualidade genotípica com critérios definidos pelo usuário.
+Allows applying genotypic quality filters with user-defined criteria, including call rate, MAF, HWE, monomorphism, chromosome filtering, and removal of SNPs at the same genomic position.
 }
 \examples{
-## Not run:
+\dontrun{
 set.seed(123)
 mat <- matrix(sample(c(0, 1, 2, NA), 100, replace = TRUE, prob = c(0.4, 0.4, 0.15, 0.05)),
               nrow = 10, ncol = 10)
@@ -44,7 +46,7 @@ rownames(mat) <- paste0("ind", 1:10)
 map <- data.frame(Name = colnames(mat), Chrom = 1, Position = 1:10)
 x <- new("SNPDataLong", geno = mat, map = map)
 
-qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, action = "report")
-## End(Not run)
+qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, snp_position = TRUE, action = "report")
+}
 
 }
