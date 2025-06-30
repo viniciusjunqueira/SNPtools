@@ -173,3 +173,40 @@ read.fimpute <- function(file) {
   
   return(snp_long)
 }
+
+#' Import imputed FImpute results from disk
+#'
+#' Reads existing imputed results from a given path and returns an object of class SNPDataLong.
+#'
+#' @param path Character. Path to the folder containing 'output_fimpute' (e.g., "fimpute_run_nelore").
+#'
+#' @return An object of class SNPDataLong containing the imputed genotypes and SNP map.
+#'
+#' @examples
+#' \dontrun{
+#' imputed_obj <- importFImputeResults("fimpute_run_nelore")
+#' head(imputed_obj@map)
+#' }
+#' @export
+importFImputeResults <- function(path) {
+  if (!is.character(path) || length(path) != 1) {
+    stop("❌ 'path' must be a single character string.")
+  }
+  
+  output_dir <- file.path(path, "output_fimpute")
+  
+  if (!dir.exists(output_dir)) {
+    stop("❌ Output directory 'output_fimpute' does not exist at: ", output_dir)
+  }
+  
+  if (!exists("read.fimpute", mode = "function")) {
+    stop("The function 'read.fimpute()' must be defined and available in the current environment.")
+  }
+  
+  message("📥 Reading FImpute results from: ", output_dir)
+  res <- read.fimpute(file = output_dir)
+  
+  message("✔ Results successfully loaded as SNPDataLong object.")
+  
+  return(res)
+}
