@@ -20,6 +20,8 @@ savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink
     stop("❌ Input object must be of class SNPDataLong.")
   }
 
+  qc_header("Saving Files in Plink Format")
+
   geno <- object@geno
   map <- object@map
   n_ind <- nrow(geno)

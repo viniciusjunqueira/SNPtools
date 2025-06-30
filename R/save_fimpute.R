@@ -92,6 +92,8 @@ save_fimpute_raw <- function(genotype, map, path) {
     stop("The 'map' argument must be a data.frame.")
   }
 
+  qc_header("Saving FImpute output files")
+
   required_cols <- c("Name", "Chromosome", "Position")
   missing_cols <- setdiff(required_cols, colnames(map))
   if (length(missing_cols) > 0) {
