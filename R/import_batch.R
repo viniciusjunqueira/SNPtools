@@ -20,10 +20,12 @@
 #' @export
 import_geno_list <- function(config_list) {
   stopifnot(is.list(config_list))
-
+  
   # Import each genotype dataset using configuration parameters
   results <- lapply(config_list, function(cfg) {
-    getGeno(
+    message("📄 Importing genotypes from: ", cfg$path)
+    
+    geno_obj <- getGeno(
       path = cfg$path,
       fields = cfg$fields,
       codes = if (!is.null(cfg$codes)) cfg$codes else c("A", "B"),
@@ -32,8 +34,23 @@ import_geno_list <- function(config_list) {
       skip = if (!is.null(cfg$skip)) cfg$skip else 0,
       verbose = if (!is.null(cfg$verbose)) cfg$verbose else TRUE
     )
+    
+    if (is.null(geno_obj)) {
+      message("⚠️ Skipping file '", cfg$path, "' because it returned NULL.")
+      return(NULL)
+    }
+    
+    return(geno_obj)
   })
-
+  
+  # Remove any NULL results (skip)
+  results <- Filter(Negate(is.null), results)
+  
+  # Check if at least one valid object remains
+  if (length(results) == 0) {
+    stop("❌ No valid genotype datasets were imported. All configurations returned NULL.")
+  }
+  
   # Combine all imported genotype datasets into one SNPDataLong object
   combinarSNPData(results)
 }
