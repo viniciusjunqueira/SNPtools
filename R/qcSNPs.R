@@ -1,22 +1,26 @@
 #' Quality Control for SNPDataLong with optional criteria
 #'
-#' Allows applying genotypic quality filters with user-defined criteria, including call rate, MAF, HWE, monomorphism, chromosome filtering, and removal of SNPs at the same genomic position.
+#' Applies flexible quality control filters on an object of class \code{SNPDataLong}. 
+#' Supports call rate filtering, minor allele frequency (MAF), Hardy-Weinberg equilibrium (HWE),
+#' removal of monomorphic SNPs, exclusion of specific chromosomes, optionally removing SNPs without positions,
+#' and optionally removing SNPs at the same genomic position.
 #'
 #' @param x An object of class SNPDataLong.
-#' @param missing_ind Maximum allowed proportion of missing data per individual (optional). *[Currently not implemented in this function]*
-#' @param missing_snp Maximum allowed proportion of missing data per SNP (optional). *[Currently not implemented in this function]*
-#' @param min_snp_cr Minimum acceptable call rate for SNPs.
-#' @param min_maf Minimum minor allele frequency allowed for SNPs (optional).
-#' @param hwe p-value threshold for Hardy-Weinberg equilibrium test (optional).
-#' @param snp_position Logical. If TRUE, removes SNPs mapped to the same position, keeping the one with the highest MAF.
-#' @param snp_mono Logical. If TRUE, identifies and removes monomorphic SNPs.
-#' @param remove_chr Character vector of chromosomes to exclude (optional).
-#' @param action One of "report" (returns a list of removed SNPs), "filter" (returns a filtered SNPDataLong object), or "both" (returns both).
+#' @param missing_ind Maximum allowed proportion of missing data per individual (optional). *[Currently not implemented]*
+#' @param missing_snp Maximum allowed proportion of missing data per SNP (optional). *[Currently not implemented]*
+#' @param min_snp_cr Minimum acceptable call rate for SNPs (e.g., 0.95).
+#' @param min_maf Minimum minor allele frequency allowed for SNPs (e.g., 0.05).
+#' @param hwe p-value threshold for Hardy-Weinberg equilibrium test (e.g., 1e-6).
+#' @param snp_position Logical. If TRUE, removes SNPs mapped to the same position, keeping the one with highest MAF.
+#' @param no_position Logical. If TRUE, removes SNPs without defined map positions.
+#' @param snp_mono Logical. If TRUE, removes monomorphic SNPs.
+#' @param remove_chr Character vector of chromosomes to exclude (e.g., c("X", "Y")).
+#' @param action One of "report" (list of removed SNPs), "filter" (returns filtered SNPDataLong), or "both" (both results).
 #'
 #' @return Depending on the action argument:
-#' - "report": list with SNPs removed by each criterion and SNPs kept.
+#' - "report": list of SNPs removed by each filter and SNPs retained.
 #' - "filter": filtered SNPDataLong object.
-#' - "both": list with the filtered object and detailed report.
+#' - "both": list containing the filtered object and detailed report.
 #'
 #' @examples
 #' \dontrun{
@@ -25,10 +29,11 @@
 #'               nrow = 10, ncol = 10)
 #' colnames(mat) <- paste0("snp", 1:10)
 #' rownames(mat) <- paste0("ind", 1:10)
-#' map <- data.frame(Name = colnames(mat), Chrom = 1, Position = 1:10)
+#' map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
 #' x <- new("SNPDataLong", geno = mat, map = map)
 #'
-#' qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, snp_position = TRUE, action = "report")
+#' # Example with multiple filters and returning a detailed report
+#' qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "report")
 #' }
 #'
 #' @importFrom reshape2 acast
@@ -43,6 +48,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                                             min_maf = NULL,
                                             hwe = NULL,
                                             snp_position = NULL,
+                                            no_position = NULL,
                                             snp_mono = FALSE,
                                             remove_chr = NULL,
                                             action = c("report", "filter", "both")) {
@@ -52,15 +58,17 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
   map <- x@map
   keep_snps <- colnames(geno)
 
-  qc_header("Quality Control on SNPs")
+  qc_header("🚦 Quality Control on SNPs")
 
-  message("Initial number of SNPs: ", length(keep_snps))
-  message("Applying quality control filters...")
+  message("ℹ️ Initial number of SNPs: ", length(keep_snps))
+  message("🔬 Applying quality control filters...")
 
   snpsum <- col.summary(geno)
 
-  low_callrate_snps <- low_maf <- dev.hwe <- mono <- discard_chr <- snpstoremove <- character()
+  # Initialize vectors to store SNPs to be removed
+  low_callrate_snps <- low_maf <- dev.hwe <- mono <- discard_chr <- snpstoremove <- no_pos <- character()
 
+  # Call rate filter
   if (!is.null(min_snp_cr)) {
     low_callrate_snps <- fQC::check.call.rate(snpsum, min.call.rate = min_snp_cr)
     keep_snps <- setdiff(keep_snps, low_callrate_snps)
@@ -68,6 +76,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(low_callrate_snps), length(keep_snps)))
   }
 
+  # MAF filter
   if (!is.null(min_maf)) {
     low_maf <- fQC::check.snp.maf(snpsum, min.maf = min_maf)
     keep_snps <- setdiff(keep_snps, low_maf)
@@ -75,6 +84,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(low_maf), length(keep_snps)))
   }
 
+  # Hardy-Weinberg filter
   if (!is.null(hwe)) {
     dev.hwe <- fQC::check.snp.hwe.chi2(snpsum, hwe)
     keep_snps <- setdiff(keep_snps, dev.hwe)
@@ -82,14 +92,23 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(dev.hwe), length(keep_snps)))
   }
 
-  if (!is.null(snp_position)) {
+  # No position filter
+  if (!is.null(no_position) && no_position) {
+    no_pos <- fQC::check.snp.no.position(map)
+    keep_snps <- setdiff(keep_snps, no_pos)
+    message(sprintf("  • No-position filter: %d SNP(s) removed; %d retained.",
+                    length(no_pos), length(keep_snps)))
+  }
+
+  # Same genomic position filter
+  if (!is.null(snp_position) && snp_position) {
     snp_same <- fQC::check.snp.same.position(map)
     message("  • Positions with overlapping SNPs: ", length(snp_same))
     n <- length(snp_same)
     if (n > 0) {
       for (i in seq_len(n)) {
-        snpsum1 <- snpsum[snp_same[[i]], ]
-        snp.high.maf <- rownames(snpsum1[snpsum1[, "MAF"] == max(snpsum1[, "MAF"]), ])[1]
+        snpsum1 <- snpsum[snp_same[[i]], , drop = FALSE]
+        snp.high.maf <- rownames(snpsum1[snpsum1[, "MAF"] == max(snpsum1[, "MAF"]), , drop = FALSE])[1]
         snpstoremove <- union(snpstoremove, setdiff(rownames(snpsum1), snp.high.maf))
       }
       keep_snps <- setdiff(keep_snps, snpstoremove)
@@ -98,6 +117,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
     }
   }
 
+  # Monomorphic SNP filter
   if (snp_mono) {
     mono <- fQC::check.snp.monomorf(snpsum)
     keep_snps <- setdiff(keep_snps, mono)
@@ -105,6 +125,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(mono), length(keep_snps)))
   }
 
+  # Chromosome filter
   if (!is.null(remove_chr)) {
     discard_chr <- fQC::check.snp.chromo(map, remove_chr)
     keep_snps <- setdiff(keep_snps, discard_chr)
@@ -112,11 +133,13 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(discard_chr), length(keep_snps)))
   }
 
+  # Report
   if (action == "report") {
     return(list(
       removed_by_callrate = low_callrate_snps,
       removed_by_maf = low_maf,
       removed_by_hwe = dev.hwe,
+      removed_no_position = no_pos,
       removed_same_position = snpstoremove,
       removed_monomorphic = mono,
       removed_by_chr = discard_chr,
@@ -124,6 +147,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
     ))
   }
 
+  # Apply filter
   filtered_geno <- geno[, keep_snps, drop = FALSE]
   filtered_map  <- map[map$Name %in% keep_snps, , drop = FALSE]
   filtered_obj  <- new("SNPDataLong", geno = filtered_geno, map = filtered_map)
@@ -139,6 +163,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
         removed_by_callrate = low_callrate_snps,
         removed_by_maf = low_maf,
         removed_by_hwe = dev.hwe,
+        removed_no_position = no_pos,
         removed_same_position = snpstoremove,
         removed_monomorphic = mono,
         removed_by_chr = discard_chr,
