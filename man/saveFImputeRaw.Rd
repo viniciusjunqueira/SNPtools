@@ -2,19 +2,20 @@
 % Please edit documentation in R/save_fimpute.R
 \name{saveFImputeRaw}
 \alias{saveFImputeRaw}
-\title{Exporta genótipos e mapa no formato FImpute a partir de argumentos simples}
+\title{Export genotypes and map using basic arguments}
 \usage{
-saveFImputeRaw(geno, map, path, name)
+saveFImputeRaw(geno, map, path)
 }
 \arguments{
-\item{geno}{Objeto do tipo SnpMatrix (do pacote snpStats)}
+\item{geno}{A `SnpMatrix` object (from the `snpStats` package).}
 
-\item{map}{Data frame com colunas 'Name', 'Chromosome' e 'Position'}
+\item{map}{A `data.frame` with columns 'Name', 'Chromosome', and 'Position'.}
 
-\item{path}{Caminho onde os arquivos serão salvos}
-
-\item{name}{Nome base para os arquivos de saída}
+\item{path}{Path where the files will be saved.}
+}
+\value{
+No return value. Files are saved to disk.
 }
 \description{
-Exporta genótipos e mapa no formato FImpute a partir de argumentos simples
+Convenience function to export FImpute files directly from a `SnpMatrix` and map `data.frame`.
 }

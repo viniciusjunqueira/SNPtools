@@ -1,20 +1,23 @@
 Package: SNPtools
-Title: Ferramentas S4 para Leitura e Organização de Dados Genéticos
+Title: S4 Tools for Reading and Organizing Genetic Data
 Version: 0.1.0
 Authors@R: c(
     person(given = "Vinícius", family = "Junqueira",
            email = "junqueiravinicius@hotmail.com", role = c("aut", "cre")))
-Maintainer: Vinicius Junqueira <junqueiravinicius@hotmail.com>
-Description: Estruturas baseadas em S4 para encapsular leitura de arquivos PLINK e FImpute com argumentos customizáveis.
-Depends: 
+Maintainer: Vinícius Junqueira <junqueiravinicius@hotmail.com>
+Description: Provides S4-based structures to encapsulate the import, organization, and processing
+    of genetic data from PLINK and FImpute files, with customizable arguments. Includes tools for
+    combining SNP panels, summarizing genotype data, and facilitating downstream quality control
+    and analysis workflows.
+Depends:
     R (>= 4.1.0),
     snpStats,
     tidyverse
-Imports: 
+Imports:
     methods,
     data.table,
     fQC
-Suggests: 
+Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr

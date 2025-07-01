@@ -2,30 +2,32 @@
 % Please edit documentation in R/getGeno.R
 \name{getGeno}
 \alias{getGeno}
-\title{Leitura flexível e eficiente de genótipos com autodetecção usando fread}
+\title{Flexible and efficient genotype file reading with autodetection using fread}
 \usage{
 getGeno(...)
 }
 \arguments{
-\item{path}{Caminho para o FinalReport.txt}
+\item{path}{Path to the directory containing \code{FinalReport.txt}}
 
-\item{fields}{Lista com as colunas: sample, snp, allele1, allele2, confidence}
+\item{fields}{A list specifying column indices for sample, SNP, allele1, allele2, and confidence}
 
-\item{codes}{Vetor com os códigos de alelos (ex: c("A", "B"))}
+\item{codes}{A character vector with allele codes (e.g., \code{c("A", "B")})}
 
-\item{threshold}{Corte para qualidade (confidence)}
+\item{threshold}{Confidence threshold for genotype calling}
 
-\item{sep}{Separador usado no arquivo}
+\item{sep}{Field separator used in the files}
 
-\item{skip}{Linhas a pular no topo}
+\item{skip}{Number of lines to skip at the start of the file}
 
-\item{verbose}{Exibir progresso?}
+\item{verbose}{Logical; if \code{TRUE}, displays progress messages}
 
-\item{every}{Frequência de progresso}
+\item{every}{Frequency of progress update (number of SNPs)}
 }
 \value{
-Objeto da classe SNPDataLong ou NULL em caso de erro
+An \code{SNPDataLong} object containing the genotype matrix and map, or \code{NULL} if an error occurs
 }
 \description{
-Leitura flexível e eficiente de genótipos com autodetecção usando fread
+This generic and method allow flexible import of SNP genotype data from Illumina FinalReport files,
+supporting fast initial column detection using \code{data.table::fread}, followed by full genotype
+matrix construction via \code{snpStats::read.snps.long}.
 }

@@ -1,5 +1,8 @@
 .Rproj.user
 inst/doc
 .Rd2pdf*/
-fimpute_run/
+fimpute_run*/
 Rplots.pdf
+plink_*/
+*.log
+*.png

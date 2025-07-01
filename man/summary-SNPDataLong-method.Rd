@@ -2,16 +2,17 @@
 % Please edit documentation in R/summary.R
 \name{summary,SNPDataLong-method}
 \alias{summary,SNPDataLong-method}
-\title{Summary para objetos da classe SNPDataLong}
+\title{Summary for SNPDataLong objects}
 \usage{
 \S4method{summary}{SNPDataLong}(object, ...)
 }
 \arguments{
-\item{object}{Objeto do tipo SNPDataLong}
+\item{object}{An object of class \code{SNPDataLong}.}
 }
 \value{
-Imprime resumo na tela
+Prints a summary to the console. Returns \code{NULL} (invisible).
 }
 \description{
-Summary para objetos da classe SNPDataLong
+Provides a detailed summary of an \code{SNPDataLong} object, including sample and SNP counts,
+proportion of missing data, and SNP distribution by chromosome if mapping information is available.
 }
