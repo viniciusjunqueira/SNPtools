@@ -63,6 +63,13 @@ setMethod("getGeno", signature(),
     sample.id <- unique(fread_result[[sample.col]])
     snp.id    <- unique(fread_result[[snp.col]])
 
+    if (length(sample.id) == 0) {
+      warning("Sample IDs could not be determined correctly; setting default numeric row names.")
+    }
+    if (length(snp.id) == 0) {
+      warning("SNP IDs could not be determined correctly; setting default numeric column names.")
+    }
+
     if (is.null(every)) every <- length(snp.id)
 
     # Full genotype matrix reading with snpStats
@@ -86,6 +93,14 @@ setMethod("getGeno", signature(),
 
     if (is.null(data)) return(NULL)
 
+    # Force row and column names
+    if (is.null(rownames(data))) {
+      rownames(data) <- sample.id
+    }
+    if (is.null(colnames(data))) {
+      colnames(data) <- snp.id
+    }
+
     # Read map file
     map_file <- file.path(path, "SNP_Map.txt")
     if (!file.exists(map_file)) {
@@ -102,6 +117,7 @@ setMethod("getGeno", signature(),
 
     if (is.null(map)) return(NULL)
 
+    # Select columns of interest from map
     map <- map[, c("Name", "Chromosome", "Position", "GenTrain.Score")]
 
     new("SNPDataLong",
