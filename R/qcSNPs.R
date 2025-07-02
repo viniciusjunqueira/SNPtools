@@ -3,19 +3,19 @@
 #' Applies flexible quality control filters on an object of class \code{SNPDataLong}. 
 #' Supports call rate filtering, minor allele frequency (MAF), Hardy-Weinberg equilibrium (HWE),
 #' removal of monomorphic SNPs, exclusion of specific chromosomes, optionally removing SNPs without positions,
-#' and optionally removing SNPs at the same genomic position.
+#' and optionally removing SNPs at the same genomic position (keeping the one with highest MAF).
 #'
 #' @param x An object of class SNPDataLong.
-#' @param missing_ind Maximum allowed proportion of missing data per individual (optional). *[Currently not implemented]*
-#' @param missing_snp Maximum allowed proportion of missing data per SNP (optional). *[Currently not implemented]*
-#' @param min_snp_cr Minimum acceptable call rate for SNPs (e.g., 0.95).
-#' @param min_maf Minimum minor allele frequency allowed for SNPs (e.g., 0.05).
-#' @param hwe p-value threshold for Hardy-Weinberg equilibrium test (e.g., 1e-6).
-#' @param snp_position Logical. If TRUE, removes SNPs mapped to the same position, keeping the one with highest MAF.
-#' @param no_position Logical. If TRUE, removes SNPs without defined map positions.
-#' @param snp_mono Logical. If TRUE, removes monomorphic SNPs.
+#' @param missing_ind Maximum allowed proportion of missing data per individual (currently not implemented).
+#' @param missing_snp Maximum allowed proportion of missing data per SNP (currently not implemented).
+#' @param min_snp_cr Minimum acceptable call rate for SNPs (e.g., 0.95). SNPs below this threshold are removed.
+#' @param min_maf Minimum minor allele frequency allowed for SNPs (e.g., 0.05). SNPs with lower MAF are removed.
+#' @param hwe p-value threshold for Hardy-Weinberg equilibrium test (e.g., 1e-6). SNPs violating this are removed.
+#' @param snp_position Logical. If TRUE, removes SNPs mapped to the same position, retaining only the one with highest MAF.
+#' @param no_position Logical. If TRUE, removes SNPs without defined genomic positions.
+#' @param snp_mono Logical. If TRUE, removes monomorphic SNPs (with no variation).
 #' @param remove_chr Character vector of chromosomes to exclude (e.g., c("X", "Y")).
-#' @param action One of "report" (list of removed SNPs), "filter" (returns filtered SNPDataLong), or "both" (both results).
+#' @param action One of "report" (returns a list of removed SNPs), "filter" (returns filtered SNPDataLong), or "both" (returns both).
 #'
 #' @return Depending on the action argument:
 #' - "report": list of SNPs removed by each filter and SNPs retained.
@@ -32,7 +32,7 @@
 #' map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
 #' x <- new("SNPDataLong", geno = mat, map = map, path = "dummy_path", xref_path = rep("chip1", 10))
 #'
-#' # Example with multiple filters
+#' # Example using multiple filters
 #' qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "filter")
 #' }
 #'
@@ -68,7 +68,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
   # Initialize vectors to store SNPs to be removed
   low_callrate_snps <- low_maf <- dev.hwe <- mono <- discard_chr <- snpstoremove <- no_pos <- character()
 
-  # Call rate filter
+  # Filter by call rate
   if (!is.null(min_snp_cr)) {
     low_callrate_snps <- fQC::check.call.rate(snpsum, min.call.rate = min_snp_cr)
     keep_snps <- setdiff(keep_snps, low_callrate_snps)
@@ -76,7 +76,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(low_callrate_snps), length(keep_snps)))
   }
 
-  # MAF filter
+  # Filter by MAF
   if (!is.null(min_maf)) {
     low_maf <- fQC::check.snp.maf(snpsum, min.maf = min_maf)
     keep_snps <- setdiff(keep_snps, low_maf)
@@ -84,7 +84,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(low_maf), length(keep_snps)))
   }
 
-  # Hardy-Weinberg filter
+  # Filter by HWE
   if (!is.null(hwe)) {
     dev.hwe <- fQC::check.snp.hwe.chi2(snpsum, hwe)
     keep_snps <- setdiff(keep_snps, dev.hwe)
@@ -92,7 +92,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(dev.hwe), length(keep_snps)))
   }
 
-  # No position filter
+  # Filter SNPs with no position
   if (!is.null(no_position) && no_position) {
     no_pos <- fQC::check.snp.no.position(map)
     keep_snps <- setdiff(keep_snps, no_pos)
@@ -100,15 +100,26 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(no_pos), length(keep_snps)))
   }
 
-  # Same genomic position filter
+  # Filter SNPs at the same genomic position
   if (!is.null(snp_position) && snp_position) {
-    snp_same <- fQC::check.snp.same.position(map)
+    # Force removal of SNPs with missing position before position filter
+    if (is.null(no_position) || !no_position) {
+      no_pos_manual <- map$Name[is.na(map$Position)]
+      if (length(no_pos_manual) > 0) {
+        warning("⚠️ SNPs without position removed automatically before snp_position filter.")
+        keep_snps <- setdiff(keep_snps, no_pos_manual)
+        map <- map[map$Name %in% keep_snps, , drop = FALSE]
+        snpsum <- snpsum[keep_snps, , drop = FALSE]
+      }
+    }
+
+    snp_same <- check.snp.same.position(map)
     message("  • Positions with overlapping SNPs: ", length(snp_same))
     n <- length(snp_same)
     if (n > 0) {
       for (i in seq_len(n)) {
         snpsum1 <- snpsum[snp_same[[i]], , drop = FALSE]
-        snp.high.maf <- rownames(snpsum1[snpsum1[, "MAF"] == max(snpsum1[, "MAF"]), , drop = FALSE])[1]
+        snp.high.maf <- rownames(snpsum1[snpsum1[, "MAF"] == max(snpsum1[, "MAF"], na.rm = TRUE), , drop = FALSE])[1]
         snpstoremove <- union(snpstoremove, setdiff(rownames(snpsum1), snp.high.maf))
       }
       keep_snps <- setdiff(keep_snps, snpstoremove)
@@ -117,7 +128,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
     }
   }
 
-  # Monomorphic SNP filter
+  # Filter monomorphic SNPs
   if (snp_mono) {
     mono <- fQC::check.snp.monomorf(snpsum)
     keep_snps <- setdiff(keep_snps, mono)
@@ -125,7 +136,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(mono), length(keep_snps)))
   }
 
-  # Chromosome filter
+  # Filter by chromosomes
   if (!is.null(remove_chr)) {
     discard_chr <- fQC::check.snp.chromo(map, remove_chr)
     keep_snps <- setdiff(keep_snps, discard_chr)
@@ -133,7 +144,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(discard_chr), length(keep_snps)))
   }
 
-  # Report only
+  # Report-only output
   if (action == "report") {
     return(list(
       removed_by_callrate = low_callrate_snps,
@@ -147,7 +158,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
     ))
   }
 
-  # Apply filter
+  # Apply final filtering
   filtered_geno <- geno[, keep_snps, drop = FALSE]
   filtered_map  <- map[map$Name %in% keep_snps, , drop = FALSE]
   filtered_obj  <- new("SNPDataLong", 
@@ -176,3 +187,56 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
     ))
   }
 })
+
+
+#' Check SNPs mapped to the same position
+#'
+#' Identifies groups of SNPs that are mapped to the exact same genomic position on each chromosome.
+#' Returns a list where each element corresponds to one group of overlapping SNPs.
+#' 
+#' @param snpmap Data frame containing at least columns "Name", "Chromosome", and "Position".
+#'
+#' @return A list of character vectors, each with names of SNPs found at the same position.
+#' 
+#' @export
+check.snp.same.position <- function(snpmap) {
+  chromo <- unique(snpmap[, "Chromosome"])
+  n <- length(chromo)
+  snps <- list()
+  k <- 1
+  for (i in seq_len(n)) {
+    message("🔎 Analyzing chromosome ", chromo[i])
+    snpmap.chr <- snpmap[snpmap[, "Chromosome"] == chromo[i], ]
+
+    # Remove SNPs sem posição antes de ordenar
+    snpmap.chr <- snpmap.chr[!is.na(snpmap.chr[, "Position"]), , drop = FALSE]
+
+    m <- nrow(snpmap.chr)
+    if (m < 2) {
+      next  # Pular cromossomos com menos de 2 SNPs válidos
+    }
+
+    sorted.snpmap.chr <- snpmap.chr[order(snpmap.chr[, "Position"]), ]
+
+    for (j in 1:(m - 1)) {
+      j1 <- j + 1
+      pos_j <- sorted.snpmap.chr[j, "Position"]
+      pos_j1 <- sorted.snpmap.chr[j1, "Position"]
+
+      # Check robusto
+      if (!is.na(pos_j) && !is.na(pos_j1) && pos_j == pos_j1) {
+        message("⚠️ SNPs in same position: ", sorted.snpmap.chr[j, "Name"], " - ", sorted.snpmap.chr[j1, "Name"])
+        if (length(snps) < k) {
+          snps[[k]] <- c(as.character(sorted.snpmap.chr[j, "Name"]), as.character(sorted.snpmap.chr[j1, "Name"]))
+        } else {
+          snps[[k]] <- c(snps[[k]], as.character(sorted.snpmap.chr[j1, "Name"]))
+        }
+      } else {
+        if (length(snps) == k) {
+          k <- k + 1
+        }
+      }
+    }
+  }
+  return(snps)
+}

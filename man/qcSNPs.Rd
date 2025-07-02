@@ -9,25 +9,25 @@ qcSNPs(x, ...)
 \arguments{
 \item{x}{An object of class SNPDataLong.}
 
-\item{missing_ind}{Maximum allowed proportion of missing data per individual (optional). *[Currently not implemented]*}
+\item{missing_ind}{Maximum allowed proportion of missing data per individual (currently not implemented).}
 
-\item{missing_snp}{Maximum allowed proportion of missing data per SNP (optional). *[Currently not implemented]*}
+\item{missing_snp}{Maximum allowed proportion of missing data per SNP (currently not implemented).}
 
-\item{min_snp_cr}{Minimum acceptable call rate for SNPs (e.g., 0.95).}
+\item{min_snp_cr}{Minimum acceptable call rate for SNPs (e.g., 0.95). SNPs below this threshold are removed.}
 
-\item{min_maf}{Minimum minor allele frequency allowed for SNPs (e.g., 0.05).}
+\item{min_maf}{Minimum minor allele frequency allowed for SNPs (e.g., 0.05). SNPs with lower MAF are removed.}
 
-\item{hwe}{p-value threshold for Hardy-Weinberg equilibrium test (e.g., 1e-6).}
+\item{hwe}{p-value threshold for Hardy-Weinberg equilibrium test (e.g., 1e-6). SNPs violating this are removed.}
 
-\item{snp_position}{Logical. If TRUE, removes SNPs mapped to the same position, keeping the one with highest MAF.}
+\item{snp_position}{Logical. If TRUE, removes SNPs mapped to the same position, retaining only the one with highest MAF.}
 
-\item{no_position}{Logical. If TRUE, removes SNPs without defined map positions.}
+\item{no_position}{Logical. If TRUE, removes SNPs without defined genomic positions.}
 
-\item{snp_mono}{Logical. If TRUE, removes monomorphic SNPs.}
+\item{snp_mono}{Logical. If TRUE, removes monomorphic SNPs (with no variation).}
 
 \item{remove_chr}{Character vector of chromosomes to exclude (e.g., c("X", "Y")).}
 
-\item{action}{One of "report" (list of removed SNPs), "filter" (returns filtered SNPDataLong), or "both" (both results).}
+\item{action}{One of "report" (returns a list of removed SNPs), "filter" (returns filtered SNPDataLong), or "both" (returns both).}
 }
 \value{
 Depending on the action argument:
@@ -39,7 +39,7 @@ Depending on the action argument:
 Applies flexible quality control filters on an object of class \code{SNPDataLong}. 
 Supports call rate filtering, minor allele frequency (MAF), Hardy-Weinberg equilibrium (HWE),
 removal of monomorphic SNPs, exclusion of specific chromosomes, optionally removing SNPs without positions,
-and optionally removing SNPs at the same genomic position.
+and optionally removing SNPs at the same genomic position (keeping the one with highest MAF).
 }
 \examples{
 \dontrun{
@@ -51,7 +51,7 @@ rownames(mat) <- paste0("ind", 1:10)
 map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
 x <- new("SNPDataLong", geno = mat, map = map, path = "dummy_path", xref_path = rep("chip1", 10))
 
-# Example with multiple filters
+# Example using multiple filters
 qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "filter")
 }
 
