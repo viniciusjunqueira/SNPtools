@@ -118,7 +118,7 @@ setMethod("getGeno", signature(),
     if (is.null(map)) return(NULL)
 
     # Select columns of interest from map
-    map <- map[, c("Name", "Chromosome", "Position", "GenTrain.Score")]
+    map <- map[, c("Name", "Chromosome", "Position")]#, "GenTrain.Score")]
 
     new("SNPDataLong",
         geno = data,

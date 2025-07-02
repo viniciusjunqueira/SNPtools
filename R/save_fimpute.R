@@ -37,14 +37,6 @@ setMethod("saveFImpute", "SNPDataLong", function(object, path = NULL) {
     path <- "fimpute_run"
   }
 
-  # Cria objeto FImputeExport apenas com slots válidos
-  fimpute_export <- new("FImputeExport",
-                        geno = object@geno,
-                        map = object@map,
-                        path = path,
-                        name = "fimpute_project")
-
-  # Passa xref_path explicitamente para raw function
   save_fimpute_raw(object@geno, object@map, path, xref = object@xref_path)
 })
 
@@ -54,13 +46,12 @@ setMethod("saveFImpute", "SNPDataLong", function(object, path = NULL) {
 #' Convenience function to export FImpute files directly from a `SnpMatrix` and map `data.frame`.
 #'
 #' @param geno A `SnpMatrix` object.
-#' @param map A data.frame with columns 'Name', 'Chromosome', 'Position'.
+#' @param map A data.frame with columns 'Name', 'Chromosome', 'Position', and 'SourcePath'.
 #' @param path Output directory.
 #' @param xref Optional vector of identifiers per individual (used to assign numeric chip IDs).
 #'
 #' @export
 saveFImputeRaw <- function(geno, map, path, xref = NULL) {
-  export <- new("FImputeExport", geno = geno, map = map, path = path, name = "fimpute_project")
   save_fimpute_raw(geno, map, path, xref = xref)
 }
 
@@ -82,7 +73,7 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
 
   qc_header("Saving FImpute Files")
 
-  required_cols <- c("Name", "Chromosome", "Position")
+  required_cols <- c("Name", "Chromosome", "Position", "SourcePath")
   missing_cols <- setdiff(required_cols, colnames(map))
   if (length(missing_cols) > 0) {
     stop("The map is missing required columns: ", paste(missing_cols, collapse = ", "))
@@ -103,22 +94,37 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
     }
   }
 
+  ## Preparar chips e checar consistência
+  snp_order <- colnames(genotype)
+
+  map_final <- map[map$Name %in% snp_order, , drop = FALSE]
+  map_final <- map_final[match(snp_order, map_final$Name), ]
+
+  stopifnot(identical(map_final$Name, snp_order))
+
+  chips <- unique(map_final$SourcePath)
+  chip_names <- paste0("Chip", seq_along(chips))
+
+  # Checar e atribuir chip_ids para indivíduos
+  # if (!is.null(xref)) {
+  #   if (!all(xref %in% chips)) {
+  #     stop("❌ The values in 'xref' must exactly match 'SourcePath' values in the map.")
+  #   }
+  #   xref_to_num <- setNames(seq_along(chips), chips)
+  #   chip_ids <- as.integer(xref_to_num[xref])
+  # } else {
+  #   chip_ids <- rep(1L, nrow(genotype))
+  # }
+
+  # Temporary solutions
+  chip_ids <- rep(1L, nrow(genotype))
+
   ## Write .gen file
   gen_file <- file.path(path, "data.gen")
   con <- file(gen_file, "wt")
 
   smp <- rownames(genotype)
   if (is.null(smp)) stop("The 'genotype' object must have row names (individual IDs).")
-
-  # Convert xref to numeric IDs (unique codes)
-  chip_ids <- rep(1, nrow(genotype)) # Default
-
-  if (!is.null(xref) && length(xref) == nrow(genotype) && !all(xref == "")) {
-    # Assign numeric code for each unique xref
-    unique_xref <- unique(xref)
-    xref_to_num <- setNames(seq_along(unique_xref), unique_xref)
-    chip_ids <- as.integer(xref_to_num[xref])
-  }
 
   nC <- max(nchar(smp), na.rm = TRUE)
   writeLines("ID    Chip                   Call...", con)
@@ -143,16 +149,44 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
   close(con)
   message("✔ File written: ", gen_file)
 
-  ## Write .map file
+  ## Write .map file (versão otimizada)
   map_file <- file.path(path, "data.map")
-  write("SNP_ID           Chr      Pos   Chip1", file = map_file)
 
-  map <- map[map$Name %in% colnames(genotype), ]
-  if (nrow(map) == 0) {
-    warning("No SNPs in the map matched the columns in the genotype object.")
-  }
+  # Chips
+  # chips <- unique(map_final$SourcePath)
+  # chip_names <- paste0("Chip", seq_along(chips))
 
-  map_out <- data.frame(map[, required_cols, drop = FALSE], 1:nrow(map))
+  # Montar cabeçalho
+  # header <- c("SNP_ID", "Chr", "Pos", chip_names)
+  # header_line <- paste(header, collapse = " ")
+  header <- c("SNP_ID", "Chr", "Pos", "Chip1")
+  header_line <- paste(header, collapse = " ")
+
+  # Escrever
+  write(header_line, file = map_file)
+
+  # for (chip in chip_names) {
+  #   map_final[[chip]] <- 0
+  # }
+
+  # chip_cols <- chip_names[match(map_final$SourcePath, chips)]
+
+  # for (chip in chip_names) {
+  #   idx <- which(chip_cols == chip)
+  #   if (length(idx) > 0) {
+  #     map_final[idx, chip] <- seq_along(idx)
+  #   }
+  # }
+
+  map_out <- data.frame(
+    SNP_ID = map_final$Name,
+    Chr = map_final$Chromosome,
+    Pos = map_final$Position,
+    # map_final[, chip_names, drop = FALSE],
+    1:nrow(map_final),
+    stringsAsFactors = FALSE
+  )
+
   write.table(
     map_out,
     file = map_file,

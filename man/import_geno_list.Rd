@@ -7,11 +7,27 @@
 import_geno_list(config_list)
 }
 \arguments{
-\item{config_list}{List of configurations (see documentation).}
+\item{config_list}{A list of configuration lists. Each element should contain:
+- `path` (character): Path to the genotype file or folder.
+- `fields` (list): Named list defining the columns (e.g., SNP ID, sample ID, alleles).
+- `codes` (character, optional): Allele codes, default is c("A", "B").
+- `threshold` (numeric, optional): Maximum allowed missingness or confidence threshold (default 0.15).
+- `sep` (character, optional): Field separator in the input file, default tab ("\t").
+- `skip` (integer, optional): Number of lines to skip at the beginning of the file.
+- `verbose` (logical, optional): Whether to print detailed messages (default TRUE).
+- `subset` (character vector, optional): Vector of sample IDs to retain after import.}
 }
 \value{
-Combined SNPDataLong object with xref_path slot correctly filled.
+An object of class `SNPDataLong` containing:
+  - Combined genotype matrix (`geno`).
+  - Combined map (`map`) as a single data.frame with `SourcePath` column and without duplicated rows.
+  - Combined `xref_path` vector (one entry per individual).
+  - Path string with semicolon-separated paths of all input datasets.
 }
 \description{
-Import multiple genotype datasets from a list of configurations
+Reads and imports multiple genotype datasets specified in a list of configurations.
+Each configuration must include the path to the genotype data and information on field mapping.
+Optionally, you can also specify codes, quality threshold, separator, lines to skip, and a subset of IDs to retain.
+The function automatically fills the `xref_path` slot per individual and combines maps into a single data.frame,
+adding a `SourcePath` column indicating their origin and removing duplicated SNP rows (by Name, Chromosome, Position).
 }

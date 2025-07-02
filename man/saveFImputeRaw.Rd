@@ -9,7 +9,7 @@ saveFImputeRaw(geno, map, path, xref = NULL)
 \arguments{
 \item{geno}{A `SnpMatrix` object.}
 
-\item{map}{A data.frame with columns 'Name', 'Chromosome', 'Position'.}
+\item{map}{A data.frame with columns 'Name', 'Chromosome', 'Position', and 'SourcePath'.}
 
 \item{path}{Output directory.}
 
