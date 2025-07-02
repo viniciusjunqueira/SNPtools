@@ -123,3 +123,4 @@ setMethod("Subset", "SNPDataLong",
             
             return(object)
           })
+
