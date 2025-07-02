@@ -49,10 +49,10 @@ mat <- matrix(sample(c(0, 1, 2, NA), 100, replace = TRUE, prob = c(0.4, 0.4, 0.1
 colnames(mat) <- paste0("snp", 1:10)
 rownames(mat) <- paste0("ind", 1:10)
 map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
-x <- new("SNPDataLong", geno = mat, map = map)
+x <- new("SNPDataLong", geno = mat, map = map, path = "dummy_path", xref_path = rep("chip1", 10))
 
-# Example with multiple filters and returning a detailed report
-qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "report")
+# Example with multiple filters
+qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "filter")
 }
 
 }

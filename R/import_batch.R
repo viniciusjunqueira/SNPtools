@@ -1,49 +1,49 @@
 #' Import multiple genotype datasets from a list of configurations
 #'
-#' This function iterates over a list of configuration lists (each specifying parameters such as path, fields, separators, etc.), 
-#' imports each genotype dataset using \code{getGeno()}, and then combines them into a single \code{SNPDataLong} object.
-#'
-#' @param config_list A list of configuration lists. Each element must include at least \code{path} and \code{fields}. 
-#' Optional elements include \code{codes}, \code{threshold}, \code{sep}, \code{skip}, and \code{verbose}.
-#'
-#' @return A unified \code{SNPDataLong} object containing combined genotype data from all configurations.
-#'
-#' @examples
-#' \dontrun{
-#' configs <- list(
-#'   list(path = "panel1", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9)),
-#'   list(path = "panel2", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9), threshold = 0.10)
-#' )
-#' combined_data <- import_geno_list(configs)
-#' }
+#' @param config_list List of configurations (see documentation).
+#' @return Combined SNPDataLong object with xref_path slot correctly filled.
 #'
 #' @export
 import_geno_list <- function(config_list) {
   stopifnot(is.list(config_list))
   
+  xref_path_list <- list()  # To store paths per individual
+
   # Import each genotype dataset using configuration parameters
   results <- lapply(config_list, function(cfg) {
-    message("📄 Importing genotypes from: ", cfg$path)
-    
     geno_obj <- getGeno(
-      path = cfg$path,
-      fields = cfg$fields,
-      codes = if (!is.null(cfg$codes)) cfg$codes else c("A", "B"),
+      path      = cfg$path,
+      fields    = cfg$fields,
+      codes     = if (!is.null(cfg$codes)) cfg$codes else c("A", "B"),
       threshold = if (!is.null(cfg$threshold)) cfg$threshold else 0.15,
-      sep = if (!is.null(cfg$sep)) cfg$sep else "\t",
-      skip = if (!is.null(cfg$skip)) cfg$skip else 0,
-      verbose = if (!is.null(cfg$verbose)) cfg$verbose else TRUE
+      sep       = if (!is.null(cfg$sep)) cfg$sep else "\t",
+      skip      = if (!is.null(cfg$skip)) cfg$skip else 0,
+      verbose   = if (!is.null(cfg$verbose)) cfg$verbose else TRUE
     )
     
     if (is.null(geno_obj)) {
-      message("⚠️ Skipping file '", cfg$path, "' because it returned NULL.")
       return(NULL)
     }
     
+    # Apply subset if present
+    if (!is.null(cfg$subset)) {
+      subset_ids <- cfg$subset
+      geno_obj@geno <- geno_obj@geno[rownames(geno_obj@geno) %in% subset_ids, , drop = FALSE]
+    }
+    
+    # Update path slot
+    geno_obj@path <- cfg$path
+
+    # Create xref path vector
+    n_ind <- nrow(geno_obj@geno)
+    if (n_ind > 0) {
+      geno_obj@xref_path <- rep(cfg$path, n_ind)
+    }
+
     return(geno_obj)
   })
   
-  # Remove any NULL results (skip)
+  # Remove NULL results
   results <- Filter(Negate(is.null), results)
   
   # Check if at least one valid object remains
@@ -51,6 +51,15 @@ import_geno_list <- function(config_list) {
     stop("❌ No valid genotype datasets were imported. All configurations returned NULL.")
   }
   
-  # Combine all imported genotype datasets into one SNPDataLong object
-  combinarSNPData(results)
+  # Combine imported genotype datasets
+  combined <- combinarSNPData(results)
+  
+  # After combination, force combined xref_path
+  all_xref_paths <- unlist(lapply(results, function(x) x@xref_path), use.names = FALSE)
+  if (is.null(all_xref_paths) || length(all_xref_paths) == 0) {
+    all_xref_paths <- character(0)
+  }
+  combined@xref_path <- all_xref_paths
+
+  return(combined)
 }

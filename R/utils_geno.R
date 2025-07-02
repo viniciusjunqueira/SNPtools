@@ -58,3 +58,68 @@ rbindSnpFlexible <- function(...) {
   
   return(combined)
 }
+
+#' Subset method for SNPDataLong
+#'
+#' @param object A SNPDataLong object.
+#' @param index Character vector with row (individual) or column (SNP) names to filter.
+#' @param margin Integer: 1 = rows (individuals), 2 = columns (SNPs).
+#' @param keep Logical: TRUE to keep specified levels, FALSE to discard them.
+#' @return A new SNPDataLong object, subsetted accordingly.
+#' @export
+setGeneric("Subset", function(object, index, margin = 1, keep = TRUE) standardGeneric("Subset"))
+
+setMethod("Subset", "SNPDataLong",
+          function(object, index, margin = 1, keep = TRUE) {
+            
+            if (!inherits(object@geno, "SnpMatrix")) {
+              stop("The 'geno' slot must be a valid SnpMatrix.")
+            }
+            if (!is.character(index)) {
+              stop("'index' must be a character vector with row or column names.")
+            }
+            if (!(margin %in% c(1, 2))) {
+              stop("'margin' must be 1 (rows) or 2 (columns).")
+            }
+            if (!is.logical(keep) || length(keep) != 1) {
+              stop("'keep' must be a single logical value (TRUE or FALSE).")
+            }
+            
+            rn <- rownames(object@geno)
+            cn <- colnames(object@geno)
+            
+            if (margin == 1) {
+              # Subset rows (individuals)
+              to_select <- rn %in% index
+              if (!keep) {
+                to_select <- !to_select
+              }
+              
+              new_geno <- object@geno[to_select, , drop = FALSE]
+              new_xref <- object@xref_path[to_select]
+              
+              # Atualiza path para conter apenas paths únicos restantes
+              new_path <- paste(unique(new_xref), collapse = ";")
+              
+              # Atualiza slots
+              object@geno <- new_geno
+              object@xref_path <- new_xref
+              object@path <- new_path
+              
+            } else {
+              # Subset columns (SNPs)
+              to_select <- cn %in% index
+              if (!keep) {
+                to_select <- !to_select
+              }
+              
+              new_geno <- object@geno[, to_select, drop = FALSE]
+              new_map <- object@map[object@map$Name %in% colnames(new_geno), , drop = FALSE]
+              
+              # Atualiza slots
+              object@geno <- new_geno
+              object@map <- new_map
+            }
+            
+            return(object)
+          })

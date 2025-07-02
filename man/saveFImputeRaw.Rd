@@ -4,17 +4,16 @@
 \alias{saveFImputeRaw}
 \title{Export genotypes and map using basic arguments}
 \usage{
-saveFImputeRaw(geno, map, path)
+saveFImputeRaw(geno, map, path, xref = NULL)
 }
 \arguments{
-\item{geno}{A `SnpMatrix` object (from the `snpStats` package).}
+\item{geno}{A `SnpMatrix` object.}
 
-\item{map}{A `data.frame` with columns 'Name', 'Chromosome', and 'Position'.}
+\item{map}{A data.frame with columns 'Name', 'Chromosome', 'Position'.}
 
-\item{path}{Path where the files will be saved.}
-}
-\value{
-No return value. Files are saved to disk.
+\item{path}{Output directory.}
+
+\item{xref}{Optional vector of identifiers per individual (used to assign numeric chip IDs).}
 }
 \description{
 Convenience function to export FImpute files directly from a `SnpMatrix` and map `data.frame`.

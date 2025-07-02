@@ -30,10 +30,10 @@
 #' colnames(mat) <- paste0("snp", 1:10)
 #' rownames(mat) <- paste0("ind", 1:10)
 #' map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
-#' x <- new("SNPDataLong", geno = mat, map = map)
+#' x <- new("SNPDataLong", geno = mat, map = map, path = "dummy_path", xref_path = rep("chip1", 10))
 #'
-#' # Example with multiple filters and returning a detailed report
-#' qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "report")
+#' # Example with multiple filters
+#' qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "filter")
 #' }
 #'
 #' @importFrom reshape2 acast
@@ -133,7 +133,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
                     length(discard_chr), length(keep_snps)))
   }
 
-  # Report
+  # Report only
   if (action == "report") {
     return(list(
       removed_by_callrate = low_callrate_snps,
@@ -150,7 +150,11 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
   # Apply filter
   filtered_geno <- geno[, keep_snps, drop = FALSE]
   filtered_map  <- map[map$Name %in% keep_snps, , drop = FALSE]
-  filtered_obj  <- new("SNPDataLong", geno = filtered_geno, map = filtered_map)
+  filtered_obj  <- new("SNPDataLong", 
+                       geno = filtered_geno, 
+                       map = filtered_map,
+                       path = x@path,
+                       xref_path = x@xref_path)
 
   if (action == "filter") {
     return(filtered_obj)

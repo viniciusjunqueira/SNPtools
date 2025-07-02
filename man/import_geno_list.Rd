@@ -7,23 +7,11 @@
 import_geno_list(config_list)
 }
 \arguments{
-\item{config_list}{A list of configuration lists. Each element must include at least \code{path} and \code{fields}. 
-Optional elements include \code{codes}, \code{threshold}, \code{sep}, \code{skip}, and \code{verbose}.}
+\item{config_list}{List of configurations (see documentation).}
 }
 \value{
-A unified \code{SNPDataLong} object containing combined genotype data from all configurations.
+Combined SNPDataLong object with xref_path slot correctly filled.
 }
 \description{
-This function iterates over a list of configuration lists (each specifying parameters such as path, fields, separators, etc.), 
-imports each genotype dataset using \code{getGeno()}, and then combines them into a single \code{SNPDataLong} object.
-}
-\examples{
-\dontrun{
-configs <- list(
-  list(path = "panel1", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9)),
-  list(path = "panel2", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9), threshold = 0.10)
-)
-combined_data <- import_geno_list(configs)
-}
-
+Import multiple genotype datasets from a list of configurations
 }

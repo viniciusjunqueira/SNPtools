@@ -16,7 +16,10 @@ Depends:
 Imports:
     methods,
     data.table,
-    fQC
+    fQC,
+    Rcpp
+LinkingTo: 
+    Rcpp
 Suggests:
     knitr,
     rmarkdown
