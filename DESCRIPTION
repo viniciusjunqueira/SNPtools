@@ -5,10 +5,7 @@ Authors@R: c(
     person(given = "Vinícius", family = "Junqueira",
            email = "junqueiravinicius@hotmail.com", role = c("aut", "cre")))
 Maintainer: Vinícius Junqueira <junqueiravinicius@hotmail.com>
-Description: Provides S4-based structures to encapsulate the import, organization, and processing
-    of genetic data from PLINK and FImpute files, with customizable arguments. Includes tools for
-    combining SNP panels, summarizing genotype data, and facilitating downstream quality control
-    and analysis workflows.
+Description: SNPtools provides an integrated suite of tools for handling SNP genotype data in large-scale genetic studies. The package supports importing and merging genotype files, performing quality control on SNP markers and samples, and preparing data for downstream analyses using popular software such as FImpute and PLINK. It offers S4 classes and methods to efficiently encapsulate SNP data, along with utilities for generating genotype summary statistics and visualization. Additional functionalities on the current version include anticlustering approaches for batch effect control, automated script generation for external software, and streamlined workflows for large datasets commonly encountered in animal and plant breeding programs. The package is designed to facilitate reproducible and scalable SNP data analyses in quantitative and statistical genetics.
 Depends:
     R (>= 4.1.0),
     snpStats,
