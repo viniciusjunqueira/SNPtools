@@ -22,9 +22,23 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// readFImputeCpp
+IntegerMatrix readFImputeCpp(std::string genotype_file, int nrows, int nsnps);
+RcppExport SEXP _SNPtools_readFImputeCpp(SEXP genotype_fileSEXP, SEXP nrowsSEXP, SEXP nsnpsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type genotype_file(genotype_fileSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< int >::type nsnps(nsnpsSEXP);
+    rcpp_result_gen = Rcpp::wrap(readFImputeCpp(genotype_file, nrows, nsnps));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_SNPtools_write_fimpute_cpp", (DL_FUNC) &_SNPtools_write_fimpute_cpp, 3},
+    {"_SNPtools_readFImputeCpp", (DL_FUNC) &_SNPtools_readFImputeCpp, 3},
     {NULL, NULL, 0}
 };
 

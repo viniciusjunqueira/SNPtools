@@ -14,7 +14,8 @@ Imports:
     methods,
     data.table,
     fQC,
-    Rcpp
+    Rcpp,
+    stringi
 LinkingTo: 
     Rcpp
 Suggests:

@@ -5,3 +5,7 @@ write_fimpute_cpp <- function(geno_mat, ids, file_path) {
     invisible(.Call('_SNPtools_write_fimpute_cpp', PACKAGE = 'SNPtools', geno_mat, ids, file_path))
 }
 
+readFImputeCpp <- function(genotype_file, nrows, nsnps) {
+    .Call('_SNPtools_readFImputeCpp', PACKAGE = 'SNPtools', genotype_file, nrows, nsnps)
+}
+
