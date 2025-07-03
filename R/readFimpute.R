@@ -1,3 +1,7 @@
+#' @useDynLib SNPtools, .registration = TRUE
+#' @importFrom Rcpp evalCpp
+NULL
+
 #' Read imputed genotypes from FImpute output and return SNPDataLong object
 #'
 #' Reads imputed genotypes and SNP information from FImpute output,
