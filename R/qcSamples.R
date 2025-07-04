@@ -31,25 +31,27 @@ setMethod("qcSamples", "SNPDataLong", function(x,
 
   geno <- x@geno
   map <- x@map
-  
-  # ⚠️ ATENÇÃO: Verifica e trata amostras duplicadas
-  # Em objetos SnpMatrix, nomes de amostras duplicados podem causar inconsistência.
-  # Aqui, mantemos apenas a primeira ocorrência de cada nome duplicado.
+  xref_path <- x@xref_path
+  path <- x@path
+
+  # Verifica e trata amostras duplicadas
   dups_logical <- duplicated(rownames(geno))
   if (any(dups_logical)) {
     message("\n⚠️  Duplicated sample identifiers detected in the SnpMatrix object.")
     message("   Only the first occurrence of each duplicated sample will be retained.")
     geno <- geno[!dups_logical, , drop = FALSE]
+    if (!is.null(xref_path) && length(xref_path) == length(dups_logical)) {
+      xref_path <- xref_path[!dups_logical]
+    }
   }
 
-  # message("Quality Control on Samples")
-  qc_header("Quality Control on Samples")
-  message("Initial number of samples: ", length(rownames(geno)))
+  qc_header("🧬 Quality Control on Samples")
+  message("Initial number of samples: ", nrow(geno))
   message("Applying quality control filters:")
-  
+
   keep_samples <- rownames(geno)
 
-  # Calcula estatísticas por indivíduo
+  # Estatísticas por indivíduo
   sample.qc <- row.summary(geno)
 
   removed_hetero <- removed_cr <- character()
@@ -58,37 +60,55 @@ setMethod("qcSamples", "SNPDataLong", function(x,
     removed_hetero <- fQC::check.sample.heterozygosity(sample.qc, heterozygosity)
     keep_samples <- setdiff(keep_samples, removed_hetero)
     message(sprintf("  • Heterozygosity filter: %d sample(s) removed, %d remaining.",
-                  length(removed_hetero), length(keep_samples)))
+                    length(removed_hetero), length(keep_samples)))
   }
 
   if (!is.null(smp_cr)) {
     removed_cr <- check.sample.call.rate(sample.qc, smp_cr)
     keep_samples <- setdiff(keep_samples, removed_cr)
     message(sprintf("  • Call rate filter: %d sample(s) removed, %d remaining.",
-                  length(removed_cr), length(keep_samples)))
+                    length(removed_cr), length(keep_samples)))
   }
 
   if (length(keep_samples) == 0) {
     stop("No samples passed the quality control filters.")
   }
 
-  # if (action == "report") {
-  #   return(list(
-  #     removed_heterozygosity = removed_hetero,
-  #     removed_call_rate = removed_cr,
-  #     kept_samples = keep_samples
-  #   ))
-  # }
+  if (action == "report") {
+    return(list(
+      removed_heterozygosity = removed_hetero,
+      removed_call_rate = removed_cr,
+      kept_samples = keep_samples
+    ))
+  }
 
-  if(is.null(action)) return(x)
+  # Aplicar filtro
+  filtered_geno <- geno[rownames(geno) %in% keep_samples, , drop = FALSE]
+  if (!is.null(xref_path) && length(xref_path) == nrow(geno)) {
+    filtered_xref <- xref_path[rownames(geno) %in% keep_samples]
+  } else {
+    filtered_xref <- xref_path
+  }
 
-  if (action %in% c("filter", "both")) {
-    filtered_geno <- geno[rownames(geno) %in% keep_samples, , drop = FALSE]
+  filtered_obj <- new("SNPDataLong",
+                      geno = filtered_geno,
+                      map = map,
+                      path = path,
+                      xref_path = filtered_xref)
 
-    return(new("SNPDataLong",
-               geno = filtered_geno,
-               map = map
-               ))
+  if (action == "filter") {
+    return(filtered_obj)
+  }
+
+  if (action == "both") {
+    return(list(
+      filtered = filtered_obj,
+      report = list(
+        removed_heterozygosity = removed_hetero,
+        removed_call_rate = removed_cr,
+        kept_samples = keep_samples
+      )
+    ))
   }
 })
 

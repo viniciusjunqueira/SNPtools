@@ -15,29 +15,13 @@ saveFImpute(object, ...)
 \arguments{
 \item{object}{An object of class `FImputeExport` or `SNPDataLong`.}
 
-\item{...}{Further arguments passed to methods.}
+\item{...}{Additional arguments passed to methods.}
 
-\item{path}{Character. Output directory where files will be written (only for `SNPDataLong` method; default = `"fimpute_run"`).}
+\item{path}{Output directory (default: "fimpute_run" for SNPDataLong).}
 }
 \value{
 No return value. Files are saved to disk.
 }
 \description{
-S4 method to export genotype (`.gen`), map (`.map`), and parameter (`data.par`) files compatible with the [FImpute](https://www.aps.uoguelph.ca/~msargol/fimpute/) software.
-}
-\examples{
-\dontrun{
-if (requireNamespace("snpStats", quietly = TRUE)) {
-  mat <- matrix(sample(c(0L, 1L, 2L), 50, replace = TRUE), nrow = 5)
-  colnames(mat) <- paste0("snp", 1:10)
-  rownames(mat) <- paste0("ind", 1:5)
-
-  sm <- new("SnpMatrix", data = as.raw(mat))
-  map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
-  x <- new("SNPDataLong", geno = sm, map = map)
-
-  saveFImpute(x, path = tempdir())
-}
-}
-
+S4 method to export genotype (.gen), map (.map), and parameter (fimpute.par) files compatible with [FImpute](https://www.aps.uoguelph.ca/~msargol/fimpute/).
 }

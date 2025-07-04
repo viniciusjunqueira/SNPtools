@@ -7,14 +7,16 @@ if (requireNamespace("snpStats", quietly = TRUE)) {
   setClassUnion("SnpMatrixOrNULL", "NULL")
 }
 
-# Define S4 classes for SNP data and related configurations
+# Define a union for map: data.frame or list
+setClassUnion("MapDataFrameOrList", c("data.frame", "list"))
 
 # Class for storing SNP data in long format
 setClass("SNPDataLong",
          slots = c(
-           geno = "SnpMatrix",    # Genotype matrix (without snpStats:: prefix)
-           map = "data.frame",    # Marker map information
-           path = "character"     # File path or identifier
+           geno = "SnpMatrix",            # Genotype matrix
+           map = "MapDataFrameOrList",    # Marker map (single or list)
+           path = "character",            # File path or identifier
+           xref_path = "character"        # Per-individual paths
          ))
 
 # Class for configuration of SNP file import
