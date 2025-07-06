@@ -3,7 +3,7 @@ name: Deploy pkgdown site
 on:
   push:
     branches:
-      - main  # Change if your default branch is different
+      - dev  # Change if your default branch is different
 
 jobs:
   deploy:
