@@ -1,0 +1,20 @@
+# _pkgdown.yml
+title: "SNPtools"
+url: "https://viniciusjunqueira.github.io/SNPtools/"
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:
+      - home
+      - reference
+      - articles
+      - news
+    right:
+      - github
+
+authors:
+  Vinicius Junqueira:
+    href: "https://github.com/viniciusjunqueira"
