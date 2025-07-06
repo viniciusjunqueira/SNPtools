@@ -1,4 +1,3 @@
-# _pkgdown.yml
 title: "SNPtools"
 url: "https://viniciusjunqueira.github.io/SNPtools/"
 
@@ -18,3 +17,7 @@ navbar:
 authors:
   Vinicius Junqueira:
     href: "https://github.com/viniciusjunqueira"
+
+# Remove license text page to avoid HTTP request
+home:
+  license: ~
