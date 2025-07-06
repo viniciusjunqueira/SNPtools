@@ -117,8 +117,19 @@ setMethod("getGeno", signature(),
 
     if (is.null(map)) return(NULL)
 
-    # Select columns of interest from map
-    map <- map[, c("Name", "Chromosome", "Position")]#, "GenTrain.Score")]
+    # Check which chromosome column exists
+    possible_chr_cols <- c("Chromosome", "Chr")
+    chr_name <- intersect(possible_chr_cols, colnames(map))
+
+    if (length(chr_name) == 0) {
+      stop("No chromosome column found (expected 'Chromosome' or 'Chr') on map file.")
+    } else {
+      chr_name <- chr_name[1]  # Use the first one found
+    }
+
+    # Select columns of interest
+    map <- map %>%
+      dplyr::select(Name, !!chr_name, Position)
 
     new("SNPDataLong",
         geno = data,

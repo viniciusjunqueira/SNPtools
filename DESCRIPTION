@@ -9,7 +9,8 @@ Description: SNPtools provides an integrated suite of tools for handling SNP gen
 Depends:
     R (>= 4.1.0),
     snpStats,
-    tidyverse
+    tidyverse,
+    dplyr
 Imports:
     methods,
     data.table,
