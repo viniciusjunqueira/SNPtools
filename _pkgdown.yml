@@ -18,6 +18,11 @@ authors:
   Vinicius Junqueira:
     href: "https://github.com/viniciusjunqueira"
 
-# Remove license text page to avoid HTTP request
+cran: false
+
 home:
-  license: ~
+  title: "SNPtools"
+  sidebar: ~
+  contents:
+    - "index.md"
+  license: false
