@@ -7,3 +7,4 @@ plink_*/
 *.log
 *.png
 docs
+.DS_Store

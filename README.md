@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="inst/figures/logo.png" alt="SNPtools logo" width="200"/>
+</p>
+
 # SNPtools
 
 `SNPtools` is an R package designed for manipulation, organization, and analysis of genotypic data, with a strong focus on integration with tools such as **FImpute** and **PLINK**.
