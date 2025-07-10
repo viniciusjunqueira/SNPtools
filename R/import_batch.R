@@ -13,7 +13,7 @@
 #'   - `fields` (list): Named list defining the columns (e.g., SNP ID, sample ID, alleles, confidence).
 #'   - `codes` (character vector, optional): Allele codes (default is c("A", "B")).
 #'   - `threshold` (numeric, optional): Maximum allowed missingness or confidence threshold (default 0.15).
-#'   - `sep` (character, optional): Field separator in the input file (default tab "\t").
+#'   - `sep` (character, optional): Field separator in the input file (default "tab-delimited").
 #'   - `skip` (integer, optional): Number of lines to skip at the beginning of the file (default 0).
 #'   - `verbose` (logical, optional): Whether to print detailed messages (default TRUE).
 #'   - `subset` (character vector, optional): Vector of sample IDs to retain after import.
