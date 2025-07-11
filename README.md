@@ -22,3 +22,23 @@ install.packages("devtools")
 devtools::install_github("viniciusjunqueira/SNPtools")
 ```
 ---
+
+## 📖 Documentation
+
+The full package website with detailed function reference and vignettes is available at:
+
+- [SNPtools pkgdown site](https://viniciusjunqueira.github.io/SNPtools/)
+
+Key pages:
+
+- [Reference index](https://viniciusjunqueira.github.io/SNPtools/reference/index.html) 
+- [Vignettes and Tutorials](https://viniciusjunqueira.github.io/SNPtools/articles/)
+
+---
+
+## 📄 License
+
+SNPtools is licensed under the GPL-3 license. See the [LICENSE](LICENSE) file for details.
+
+[![pkgdown](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://viniciusjunqueira.github.io/SNPtools/)
+[![GitHub issues](https://img.shields.io/github/issues/viniciusjunqueira/SNPtools)](https://github.com/viniciusjunqueira/SNPtools/issues)
