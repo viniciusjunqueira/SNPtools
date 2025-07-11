@@ -5,7 +5,8 @@ fimpute_run*/
 Rplots.pdf
 plink_*/
 *.log
-*.png
+# *.png
 docs
 *.o
 *.so
+.DS_Store
