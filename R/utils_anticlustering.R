@@ -19,25 +19,25 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
   if (!inherits(object, "SNPDataLong")) {
     stop("Input object must be of class SNPDataLong.")
   }
-  
+
   snpsum <- col.summary(object = object@geno)
   mono <- check.snp.monomorf(snpsum)
   object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
-  
+
   geno_matrix <- as(object@geno, "numeric")
   geno_df <- as.data.frame(geno_matrix)
-  
+
   rownames(geno_df) <- rownames(object@geno)
   colnames(geno_df) <- colnames(object@geno)
-  
+
   if (isTRUE(center) || isTRUE(scale) || is.numeric(center) || is.numeric(scale)) {
     cat("⚖️ Applying centering and/or scaling to SNP columns...\n")
     geno_df <- as.data.frame(scale(geno_df, center = center, scale = scale))
   }
-  
-  cat("✅ Genotype data converted to data.frame with dimensions:", 
+
+  cat("✅ Genotype data converted to data.frame with dimensions:",
       nrow(geno_df), "x", ncol(geno_df), "\n")
-  
+
   return(geno_df)
 }
 
@@ -106,19 +106,19 @@ plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
   explained_var <- pca_res$sdev^2 / sum(pca_res$sdev^2)
   pc1_var <- round(100 * explained_var[pcs[1]], 2)
   pc2_var <- round(100 * explained_var[pcs[2]], 2)
-  
+
   pc_df <- data.frame(
     PC1 = pca_res$x[, pcs[1]],
     PC2 = pca_res$x[, pcs[2]],
     Group = as.factor(groups)
   )
-  
+
   p <- ggplot(pc_df, aes(x = PC1, y = PC2, color = Group)) +
     geom_point(size = 2, alpha = 0.8) +
     labs(
       title = "PCA plot colored by Anticlustering Group",
       x = paste0("PC", pcs[1], " (", pc1_var, "%)"),
-      y = paste0("PC", pcs[2], "%)")
+      y = paste0("PC", pcs[2], " (", pc2_var, "%)")
     ) +
     theme_minimal() +
     theme(legend.position = "right")
@@ -130,6 +130,6 @@ plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
   } else {
     print(p)
   }
-  
+
   return(p)
 }

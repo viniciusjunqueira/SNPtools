@@ -16,7 +16,8 @@ Imports:
     methods,
     data.table,
     Rcpp,
-    stringi
+    stringi,
+    anticlust
 LinkingTo: 
     Rcpp
 Suggests:
