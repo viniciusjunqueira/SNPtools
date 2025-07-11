@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="inst/figures/logo.png" alt="SNPtools logo" width="200"/>
+  <img src="man/figures/logo.png" alt="SNPtools logo" width="200"/>
 </p>
 
 # SNPtools
