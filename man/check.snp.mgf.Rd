@@ -23,3 +23,6 @@ rownames(df) <- c("SNP1", "SNP2")
 check.snp.mgf(df, 0.05)
 
 }
+\author{
+Roberto Higa
+}

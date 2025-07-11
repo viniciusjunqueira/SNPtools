@@ -23,3 +23,6 @@ Identifies identical samples within SNP blocks.
 # See check.identical.samples example
 
 }
+\author{
+Roberto Higa
+}

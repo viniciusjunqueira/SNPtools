@@ -22,3 +22,6 @@ df <- data.frame(z.HWE = c(2, 5), row.names = c("SNP1", "SNP2"))
 check.snp.hwe(df, 3)
 
 }
+\author{
+Roberto Higa
+}

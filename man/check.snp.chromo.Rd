@@ -22,3 +22,6 @@ snpmap <- data.frame(Chromosome = c(1, 1, 2), Name = c("SNP1", "SNP2", "SNP3"))
 check.snp.chromo(snpmap, 1)
 
 }
+\author{
+Roberto Higa
+}
