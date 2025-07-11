@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="inst/figures/logo.png" alt="SNPtools logo" width="200"/>
+  <img src="man/figures/logo.png" alt="SNPtools logo" width="200"/>
 </p>
 
 # SNPtools
@@ -23,23 +23,22 @@ devtools::install_github("viniciusjunqueira/SNPtools")
 ```
 ---
 
-## Usage
+## 📖 Documentation
 
-```r
-library(SNPtools)
+The full package website with detailed function reference and vignettes is available at:
 
-# Example: print a formatted header
-qc_header("Starting genotype preprocessing")
+- [SNPtools pkgdown site](https://viniciusjunqueira.github.io/SNPtools/)
 
-# Example configuration list
-configs <- list(
-  list(path = "panel1", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9)),
-  list(path = "panel2", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9), threshold = 0.10)
-)
+Key pages:
 
-# Import and combine genotype data
-combined_data <- import_geno_list(configs)
+- [Reference index](https://viniciusjunqueira.github.io/SNPtools/reference/index.html) 
+- [Vignettes and Tutorials](https://viniciusjunqueira.github.io/SNPtools/articles/)
 
-# Print a summary
-summary(combined_data)
-```
+---
+
+## 📄 License
+
+SNPtools is licensed under the GPL-3 license. See the [LICENSE](LICENSE) file for details.
+
+[![pkgdown](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://viniciusjunqueira.github.io/SNPtools/)
+[![GitHub issues](https://img.shields.io/github/issues/viniciusjunqueira/SNPtools)](https://github.com/viniciusjunqueira/SNPtools/issues)
