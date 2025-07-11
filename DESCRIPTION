@@ -23,7 +23,7 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Encoding: UTF-8
-# License: GPL-3
+License: GPL-3
 URL: https://viniciusjunqueira.github.io/SNPtools
 BugReports: https://github.com/viniciusjunqueira/SNPtools/issues
 RoxygenNote: 7.3.2
