@@ -6,7 +6,7 @@ Rplots.pdf
 plink_*/
 *.log
 # *.png
-docs
+# docs
 *.o
 *.so
 .DS_Store
