@@ -14,7 +14,6 @@ Depends:
 Imports:
     methods,
     data.table,
-    fQC,
     Rcpp,
     stringi
 LinkingTo: 
