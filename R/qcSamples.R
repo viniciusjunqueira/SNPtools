@@ -18,7 +18,6 @@
 #'       - `filtered`: the filtered `SNPDataLong` object;
 #'       - `report`: a list of removed and kept samples.
 #'
-#' @importFrom fQC check.sample.heterozygosity
 #' @export
 setGeneric("qcSamples", function(x, ...) standardGeneric("qcSamples"))
 
@@ -57,7 +56,7 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   removed_hetero <- removed_cr <- character()
 
   if (!is.null(heterozygosity)) {
-    removed_hetero <- fQC::check.sample.heterozygosity(sample.qc, heterozygosity)
+    removed_hetero <- check.sample.heterozygosity(sample.qc, heterozygosity)
     keep_samples <- setdiff(keep_samples, removed_hetero)
     message(sprintf("  • Heterozygosity filter: %d sample(s) removed, %d remaining.",
                     length(removed_hetero), length(keep_samples)))

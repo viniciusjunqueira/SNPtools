@@ -21,7 +21,7 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
   }
   
   snpsum <- col.summary(object = object@geno)
-  mono <- fQC::check.snp.monomorf(snpsum)
+  mono <- check.snp.monomorf(snpsum)
   object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
   
   geno_matrix <- as(object@geno, "numeric")
