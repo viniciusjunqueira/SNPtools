@@ -25,3 +25,6 @@ rownames(df) <- c("A", "B", "C")
 get.gender(df, 0.2, 0.5)
 
 }
+\author{
+Roberto Higa
+}

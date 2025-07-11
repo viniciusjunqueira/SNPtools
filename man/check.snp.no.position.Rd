@@ -20,3 +20,6 @@ df <- data.frame(Position = c(0, 100), Name = c("SNP1", "SNP2"))
 check.snp.no.position(df)
 
 }
+\author{
+Roberto Higa
+}

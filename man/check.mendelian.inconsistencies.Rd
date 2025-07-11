@@ -23,3 +23,6 @@ Identifies Mendelian inconsistencies between father-child pairs.
 # Requires proper parent-child genotype data
 
 }
+\author{
+Roberto Higa
+}

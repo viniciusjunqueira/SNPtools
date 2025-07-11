@@ -21,3 +21,6 @@ rownames(df) <- c("SNP1", "SNP2")
 check.snp.monomorf(df)
 
 }
+\author{
+Roberto Higa
+}

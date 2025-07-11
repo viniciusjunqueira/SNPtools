@@ -22,3 +22,6 @@ df <- data.frame(MAF = c(0.01, 0.2), row.names = c("SNP1", "SNP2"))
 check.snp.maf(df, 0.05)
 
 }
+\author{
+Roberto Higa
+}

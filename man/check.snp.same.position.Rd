@@ -27,3 +27,6 @@ df <- data.frame(Chromosome = c(1, 1, 2), Position = c(100, 100, 200), Name = c(
 check.snp.same.position(df)
 
 }
+\author{
+Roberto Higa
+}

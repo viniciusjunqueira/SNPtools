@@ -23,5 +23,5 @@ check.call.rate(df, 0.9)
 
 }
 \author{
-Roberto Higa, adapted by Vinícius
+Roberto Higa
 }

@@ -20,3 +20,6 @@ pairs <- matrix(c("A", "B", "B", "C", "D", "E"), ncol = 2, byrow = TRUE)
 pairs2sets(pairs)
 
 }
+\author{
+Roberto Higa
+}

@@ -21,3 +21,6 @@ Calculates number of inconsistencies and total comparable SNPs for a parent-chil
 # Used internally by check.mendelian.inconsistencies
 
 }
+\author{
+Roberto Higa
+}

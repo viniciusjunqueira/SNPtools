@@ -20,3 +20,6 @@ check.ibs(c(1, 1))
 check.ibs(c(1, 3))
 
 }
+\author{
+Roberto Higa
+}

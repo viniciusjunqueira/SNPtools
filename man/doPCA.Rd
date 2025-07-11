@@ -19,3 +19,6 @@ Performs PCA using the genome relationship matrix (GRM).
 # Requires matrix of numeric genotypes
 
 }
+\author{
+Roberto Higa
+}
