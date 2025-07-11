@@ -487,7 +487,7 @@ pairs2sets <- function(pairs) {
 #' # Requires matrix of numeric genotypes
 #'
 #' @export
-do.pca <- function(genotypes) {
+doPCA <- function(genotypes) {
   xxmat <- xxt(genotypes, correct.for.missing = FALSE)
   evv <- eigen(xxmat, symmetric = TRUE)
   pcs <- evv$vectors
