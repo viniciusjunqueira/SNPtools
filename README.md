@@ -22,24 +22,3 @@ install.packages("devtools")
 devtools::install_github("viniciusjunqueira/SNPtools")
 ```
 ---
-
-## Usage
-
-```r
-library(SNPtools)
-
-# Example: print a formatted header
-qc_header("Starting genotype preprocessing")
-
-# Example configuration list
-configs <- list(
-  list(path = "panel1", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9)),
-  list(path = "panel2", fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9), threshold = 0.10)
-)
-
-# Import and combine genotype data
-combined_data <- import_geno_list(configs)
-
-# Print a summary
-summary(combined_data)
-```
