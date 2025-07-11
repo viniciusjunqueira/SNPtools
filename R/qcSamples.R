@@ -18,7 +18,6 @@
 #'       - `filtered`: the filtered `SNPDataLong` object;
 #'       - `report`: a list of removed and kept samples.
 #'
-#' @importFrom fQC check.sample.heterozygosity
 #' @export
 setGeneric("qcSamples", function(x, ...) standardGeneric("qcSamples"))
 
