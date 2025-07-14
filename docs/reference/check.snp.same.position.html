@@ -84,17 +84,20 @@ Returns a list where each element corresponds to one group of overlapping SNPs.<
     </div>
     <div id="author">
     <h2>Author</h2>
-    <p>Roberto Higa</p>
+    <p>Roberto Higa, adaptaded by Vinicius Junqueira</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Chromosome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, Position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>, Name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SNP1"</span>, <span class="st">"SNP2"</span>, <span class="st">"SNP3"</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Chromosome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                 Position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                 Name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SNP1"</span>, <span class="st">"SNP2"</span>, <span class="st">"SNP3"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">check.snp.same.position</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Analyzing chromosome  1"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "SNPs in same position:  SNP1  -  SNP2"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Analyzing chromosome  2"</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (sorted.snpmap.chr[j, "Position"] == sorted.snpmap.chr[j1,     "Position"]) {    print(paste("SNPs in same position: ", sorted.snpmap.chr[j,         "Name"], " - ", sorted.snpmap.chr[j1, "Name"]))    if (length(snps) &lt; k) {        snps[[k]] &lt;- c(as.character(sorted.snpmap.chr[j, "Name"]),             as.character(sorted.snpmap.chr[j1, "Name"]))    }    else {        snps[[k]] &lt;- c(snps[[k]], as.character(sorted.snpmap.chr[j1,             "Name"]))    }} else {    if (length(snps) == k) {        k &lt;- k + 1    }}:</span> missing value where TRUE/FALSE needed</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing chromosome 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing chromosome 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "SNP1" "SNP2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

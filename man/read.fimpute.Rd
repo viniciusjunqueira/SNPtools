@@ -22,4 +22,5 @@ builds a SnpMatrix and a corresponding map, and returns an SNPDataLong object.
 \dontrun{
 snp_long <- read.fimpute("output_fimpute", method = "R")
 }
+
 }

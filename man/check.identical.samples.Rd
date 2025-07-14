@@ -7,12 +7,12 @@
 check.identical.samples(genotypes, threshold = 0)
 }
 \arguments{
-\item{genotypes}{Genotype matrix (samples x SNPs).}
+\item{genotypes}{Genotype matrix (samples x SNPs) or SnpMatrix.}
 
 \item{threshold}{Numeric distance threshold. Default 0.}
 }
 \value{
-List of identical sample pairs.
+Data frame of identical sample pairs.
 }
 \description{
 Identifies sample pairs considered identical based on genotype distances.
@@ -24,5 +24,5 @@ check.identical.samples(mat, 0.5)
 
 }
 \author{
-Roberto Higa
+Roberto Higa, adapted by Vinicius Junqueira
 }

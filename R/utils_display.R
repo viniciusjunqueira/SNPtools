@@ -11,8 +11,8 @@
 #'
 #' @export
 qc_header <- function(title) {
-  bar <- strrep("═", nchar(title) + 8)
-  message("\n╔", bar, "╗")
-  message("║    ", title, "    ║")
-  message("╚", bar, "╝\n")
+  bar <- strrep("=", nchar(title) + 8)
+  message("\n+", bar, "+")
+  message("|    ", title, "    |")
+  message("+", bar, "+\n")
 }

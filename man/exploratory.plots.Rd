@@ -33,7 +33,7 @@ exploratory.plots(
 \item{hierq.plot}{Filename for hierarchical cluster plot.}
 }
 \value{
-None. Plots are saved as JPEG files.
+NULL (plots are saved as JPEG files)
 }
 \description{
 Generates exploratory plots: MAF histograms, HWE plots, heterozygosity scatter, MDS, and dendrogram.
@@ -43,5 +43,5 @@ Generates exploratory plots: MAF histograms, HWE plots, heterozygosity scatter, 
 
 }
 \author{
-Roberto Higa
+Roberto Higa, adapted by Vinicius Junqueira
 }

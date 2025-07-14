@@ -7,7 +7,7 @@
 #' @param object An object of class `FImputeRunner`.
 #' @param verbose Logical. If TRUE (default), FImpute output will be printed to the console.
 #'
-#' @return An updated `FImputeRunner` object with the `results` slot populated (SnpMatrix).
+#' @return An updated `FImputeRunner` object with the `results` slot populated (SNPDataLong).
 #' @examples
 #' \dontrun{
 #' # Example: Running FImpute from a FImputeRunner object
@@ -27,8 +27,9 @@
 #'               exec_path = fimpute_exec)
 #'
 #' runner <- runFImpute(runner, verbose = TRUE)
-#' head(runner@results)
+#' head(runner@results@geno)
 #' }
+#' @importFrom methods new
 #' @export
 setGeneric("runFImpute", function(object, verbose = TRUE) standardGeneric("runFImpute"))
 
@@ -54,18 +55,18 @@ setMethod("runFImpute", "FImputeRunner", function(object, verbose = TRUE) {
   destino_par <- file.path(dir, "fimpute.par")
   if (normalizePath(par_file) != normalizePath(destino_par)) {
     file.copy(par_file, destino_par, overwrite = TRUE)
-    message("✓ Parameter file copied to working directory: ", destino_par)
+    message("Parameter file copied to working directory: ", destino_par)
   } else {
-    message("✓ Parameter file already in working directory, no copy needed.")
+    message("Parameter file already in working directory, no copy needed.")
   }
 
   output_dir <- file.path(dir, "output_fimpute")
   if (dir.exists(output_dir)) {
-    message("⚠️ Removing previous output directory: ", output_dir)
+    message("Removing previous output directory: ", output_dir)
     unlink(output_dir, recursive = TRUE, force = TRUE)
   }
 
-  message("🧬 Running FImpute...")
+  message("Running FImpute...")
 
   command <- paste("cd", shQuote(dir), "&&", shQuote(resolved_exec), "fimpute.par")
   status <- system(
@@ -76,11 +77,11 @@ setMethod("runFImpute", "FImputeRunner", function(object, verbose = TRUE) {
   )
 
   if (status != 0) {
-    stop("❌ FImpute execution failed. Please check the executable and input files.")
+    stop("FImpute execution failed. Please check the executable and input files.")
   }
 
   if (!dir.exists(output_dir)) {
-    stop("❌ Output directory 'output_fimpute' was not created. FImpute may have failed silently.")
+    stop("Output directory 'output_fimpute' was not created. FImpute may have failed silently.")
   }
 
   if (!exists("read.fimpute", mode = "function")) {
@@ -89,13 +90,9 @@ setMethod("runFImpute", "FImputeRunner", function(object, verbose = TRUE) {
 
   res <- read.fimpute(file = output_dir)
 
-  # if (!inherits(res, "SnpMatrix")) {
-    # stop("The function 'read.fimpute()' did not return a SnpMatrix object. Please verify its behavior.")
-  # }
-
-  message("✔ Results successfully read and stored in 'results' slot of FImputeRunner.")
-  object <- res
+  # Armazena objeto completo SNPDataLong no slot results
   # object@results <- res
 
-  return(object)
+  message("Results successfully read and stored in 'results' slot of FImputeRunner.")
+  return(res)
 })

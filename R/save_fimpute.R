@@ -50,6 +50,7 @@ setMethod("saveFImpute", "SNPDataLong", function(object, path = NULL) {
 #' @param path Output directory.
 #' @param xref Optional vector of identifiers per individual (used to assign numeric chip IDs).
 #'
+#' @importFrom utils write.table
 #' @export
 saveFImputeRaw <- function(geno, map, path, xref = NULL) {
   save_fimpute_raw(geno, map, path, xref = xref)
@@ -84,17 +85,16 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
   }
 
   if (!dir.exists(path)) {
-    message("📁 Creating output directory: ", path)
+    message("Creating output directory: ", path)
     dir.create(path, recursive = TRUE)
   } else {
     existing_files <- list.files(path, pattern = "data\\.(gen|map|par)$", full.names = TRUE)
     if (length(existing_files) > 0) {
-      warning("⚠️ The following files will be overwritten:\n  ",
+      warning("The following files will be overwritten:\n  ",
               paste(basename(existing_files), collapse = "\n  "))
     }
   }
 
-  ## Preparar chips e checar consistência
   snp_order <- colnames(genotype)
 
   map_final <- map[map$Name %in% snp_order, , drop = FALSE]
@@ -105,10 +105,9 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
   chips <- unique(map_final$SourcePath)
   chip_names <- paste0("Chip", seq_along(chips))
 
-  # Checar e atribuir chip_ids para indivíduos
   # if (!is.null(xref)) {
   #   if (!all(xref %in% chips)) {
-  #     stop("❌ The values in 'xref' must exactly match 'SourcePath' values in the map.")
+  #     stop("The values in 'xref' must exactly match 'SourcePath' values in the map.")
   #   }
   #   xref_to_num <- setNames(seq_along(chips), chips)
   #   chip_ids <- as.integer(xref_to_num[xref])
@@ -147,16 +146,15 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
 
   close(pb)
   close(con)
-  message("✔ File written: ", gen_file)
+  message("File written: ", gen_file)
 
-  ## Write .map file (versão otimizada)
+  ## Write .map file
   map_file <- file.path(path, "data.map")
 
   # Chips
   # chips <- unique(map_final$SourcePath)
   # chip_names <- paste0("Chip", seq_along(chips))
 
-  # Montar cabeçalho
   # header <- c("SNP_ID", "Chr", "Pos", chip_names)
   # header_line <- paste(header, collapse = " ")
   header <- c("SNP_ID", "Chr", "Pos", "Chip1")
@@ -187,7 +185,7 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
     stringsAsFactors = FALSE
   )
 
-  write.table(
+  utils::write.table(
     map_out,
     file = map_file,
     quote = FALSE,
@@ -196,7 +194,7 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
     sep = " ",
     append = TRUE
   )
-  message("✔ File written: ", map_file)
+  message("File written: ", map_file)
 
   ## Write fimpute.par file
   par_file <- file.path(path, "fimpute.par")
@@ -209,7 +207,7 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
     'save_genotype;',
     'njob=24;'
   ), con = par_file)
-  message("✔ File written: ", par_file)
+  message("File written: ", par_file)
 
   invisible(NULL)
 }

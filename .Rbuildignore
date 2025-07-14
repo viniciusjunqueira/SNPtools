@@ -3,3 +3,7 @@
 ^pkgdown$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$
+^SNPtools-package\\.R$
+^SNPtools_0\\.1\\.0\\.pdf$

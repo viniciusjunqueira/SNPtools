@@ -1,3 +1,8 @@
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c("PC1", "PC2", "Group"))
+}
+
+
 #' Convert geno slot from SNPDataLong to a data.frame
 #'
 #' Converts the genotype matrix (geno slot) of a SNPDataLong object to a data.frame,
@@ -20,7 +25,7 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
     stop("Input object must be of class SNPDataLong.")
   }
 
-  snpsum <- col.summary(object = object@geno)
+  snpsum <- snpStats::col.summary(object = object@geno)
   mono <- check.snp.monomorf(snpsum)
   object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
 
@@ -31,11 +36,11 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
   colnames(geno_df) <- colnames(object@geno)
 
   if (isTRUE(center) || isTRUE(scale) || is.numeric(center) || is.numeric(scale)) {
-    cat("⚖️ Applying centering and/or scaling to SNP columns...\n")
+    cat("Applying centering and/or scaling to SNP columns...\n")
     geno_df <- as.data.frame(scale(geno_df, center = center, scale = scale))
   }
 
-  cat("✅ Genotype data converted to data.frame with dimensions:",
+  cat("Genotype data converted to data.frame with dimensions:",
       nrow(geno_df), "x", ncol(geno_df), "\n")
 
   return(geno_df)
@@ -64,21 +69,21 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #' @export
 runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
   if (!inherits(object, "SNPDataLong")) {
-    stop("❌ Input object must be of class SNPDataLong.")
+    stop("Input object must be of class SNPDataLong.")
   }
 
   geno_df <- genoToDF(object, center = center, scale = scale)
-  cat("✅ Genotype data frame created for PCA.\n")
+  cat("Genotype data frame created for PCA.\n")
 
-  cat("⚡ Running PCA...\n")
-  pca_res <- prcomp(geno_df, center = FALSE, scale. = FALSE)
+  cat("Running PCA...\n")
+  pca_res <- stats::prcomp(geno_df, center = FALSE, scale. = FALSE)
 
   top_pcs <- pca_res$x[, seq_len(n_pcs)]
-  cat("✅ Top", n_pcs, "PCs extracted.\n")
+  cat("Top", n_pcs, "PCs extracted.\n")
 
-  cat("⚖️ Running anticlustering with", K, "groups...\n")
-  groups <- fast_anticlustering(top_pcs, K = K)
-  cat("✅ Anticlustering completed. Groups assigned.\n")
+  cat("Running anticlustering with", K, "groups...\n")
+  groups <- anticlust::fast_anticlustering(top_pcs, K = K)
+  cat("Anticlustering completed. Groups assigned.\n")
 
   return(list(
     groups = groups,
@@ -101,6 +106,8 @@ runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale
 #' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
 #' plotPCAgroups(res$pca, res$groups)
 #' }
+#'
+#' @importFrom ggplot2 ggplot aes geom_point labs theme_minimal theme element_rect ggsave
 #' @export
 plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
   explained_var <- pca_res$sdev^2 / sum(pca_res$sdev^2)
@@ -113,20 +120,20 @@ plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
     Group = as.factor(groups)
   )
 
-  p <- ggplot(pc_df, aes(x = PC1, y = PC2, color = Group)) +
-    geom_point(size = 2, alpha = 0.8) +
-    labs(
+  p <- ggplot2::ggplot(pc_df, ggplot2::aes(x = PC1, y = PC2, color = Group)) +
+    ggplot2::geom_point(size = 2, alpha = 0.8) +
+    ggplot2::labs(
       title = "PCA plot colored by Anticlustering Group",
       x = paste0("PC", pcs[1], " (", pc1_var, "%)"),
       y = paste0("PC", pcs[2], " (", pc2_var, "%)")
     ) +
-    theme_minimal() +
-    theme(legend.position = "right")
-  p <- p + theme(plot.background = element_rect(fill = "white", color = NA))
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "right") +
+    ggplot2::theme(plot.background = ggplot2::element_rect(fill = "white", color = NA))
 
   if (!is.null(filename)) {
-    ggsave(filename, p, width = 7, height = 5)
-    cat("✅ Plot saved to:", filename, "\n")
+    ggplot2::ggsave(filename, p, width = 7, height = 5, dpi = 300)
+    cat("Plot saved to:", filename, "\n")
   } else {
     print(p)
   }

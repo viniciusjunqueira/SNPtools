@@ -28,16 +28,16 @@
 import_geno_list <- function(config_list) {
   # Validate input
   stopifnot(is.list(config_list))
-  
+
   # Total number of paths to process
   total_paths <- length(config_list)
   counter <- 1
-  
+
   # Process each configuration
   results <- lapply(config_list, function(cfg) {
     # Print progress message with counter
-    message(sprintf("📄 Loading path %d/%d: %s", counter, total_paths, cfg$path))
-    
+    message(sprintf("Loading path %d/%d: %s", counter, total_paths, cfg$path))
+
     # Call getGeno with parameters from config
     geno_obj <- getGeno(
       path      = cfg$path,
@@ -48,70 +48,70 @@ import_geno_list <- function(config_list) {
       skip      = if (!is.null(cfg$skip)) cfg$skip else 0,
       verbose   = if (!is.null(cfg$verbose)) cfg$verbose else TRUE
     )
-    
+
     # If failed, warn and continue
     if (is.null(geno_obj)) {
-      warning("⚠️ No data returned for path: ", cfg$path)
+      warning("No data returned for path: ", cfg$path)
       counter <<- counter + 1
       return(NULL)
     }
-    
+
     # Apply subset filter if provided
     if (!is.null(cfg$subset)) {
       subset_ids <- cfg$subset
       geno_obj@geno <- geno_obj@geno[rownames(geno_obj@geno) %in% subset_ids, , drop = FALSE]
     }
-    
+
     # Update path slot
     geno_obj@path <- cfg$path
-    
+
     # Fill xref_path with path per individual
     n_ind <- nrow(geno_obj@geno)
     if (n_ind > 0) {
       geno_obj@xref_path <- rep(cfg$path, n_ind)
     }
-    
+
     # Check map validity
     if (is.null(geno_obj@map) || is.character(geno_obj@map)) {
-      stop("❌ Invalid map in configuration with path: ", cfg$path, 
+      stop("Invalid map in configuration with path: ", cfg$path,
            ". Check that getGeno returns a valid data.frame for map.")
     }
-    
+
     # Add source path column in map
     geno_obj@map$SourcePath <- cfg$path
-    
+
     counter <<- counter + 1
     return(geno_obj)
   })
-  
+
   # Remove failed or NULL results
   results <- Filter(Negate(is.null), results)
-  
+
   # Check if at least one valid object remains
   if (length(results) == 0) {
-    stop("❌ No valid genotype datasets were imported. All configurations returned NULL.")
+    stop("No valid genotype datasets were imported. All configurations returned NULL.")
   }
-  
+
   # Combine genotype matrices (custom function you already have)
-  combined <- combinarSNPData(results)
-  
+  combined <- combineSNPData(results)
+
   # Combine xref paths
   all_xref_paths <- unlist(lapply(results, function(x) x@xref_path), use.names = FALSE)
   combined@xref_path <- if (is.null(all_xref_paths) || length(all_xref_paths) == 0) character(0) else all_xref_paths
-  
+
   # Combine all maps
   all_maps_df <- do.call(rbind, lapply(results, function(x) x@map))
-  
+
   # Remove duplicated rows by Name
   dup_idx <- duplicated(all_maps_df[, c("Name")])
   all_maps_df <- all_maps_df[!dup_idx, , drop = FALSE]
-  
+
   # Assign merged map to combined object
   combined@map <- all_maps_df
-  
+
   # Update combined path slot with semicolon-separated paths
   paths <- vapply(results, function(x) x@path, character(1))
   combined@path <- paste(paths, collapse = ";")
-  
+
   return(combined)
 }

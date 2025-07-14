@@ -1,12 +1,32 @@
+# RStudio
 .Rproj.user
-inst/doc
-.Rd2pdf*/
-fimpute_run*/
-Rplots.pdf
-plink_*/
-*.log
-# *.png
-# docs
+*.Rproj
+
+# Build & check
+*.tar.gz
+*.pdf
 *.o
 *.so
+*.log
+.Rd2pdf*/
+Rplots.pdf
+
+# Outputs temporários
+fimpute_run*/
+plink_*/
+SNPtools.Rcheck/
+.Rcheck/
+
+# MacOS
 .DS_Store
+
+# Docs auxiliares
+inst/doc
+/doc/
+/Meta/
+
+# Pkgdown outputs temporários (caso não queira versionar)
+docs/
+
+# Images temporárias
+# *.png

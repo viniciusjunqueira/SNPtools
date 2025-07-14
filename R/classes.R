@@ -7,49 +7,98 @@ if (requireNamespace("snpStats", quietly = TRUE)) {
   setClassUnion("SnpMatrixOrNULL", "NULL")
 }
 
-# Define a union for map: data.frame or list
+# Define union for map slot before using it
 setClassUnion("MapDataFrameOrList", c("data.frame", "list"))
 
-# Class for storing SNP data in long format
+
+#' SNPDataLong Class
+#'
+#' A class to store SNP genotype data in long format, including genotype matrix, marker map, and file paths.
+#'
+#' @slot geno A SnpMatrix containing genotype data.
+#' @slot map A data.frame or list containing marker information.
+#' @slot path A character string with the file path or identifier.
+#' @slot xref_path A character string with per-individual paths or identifiers.
+#'
+#' @export
 setClass("SNPDataLong",
          slots = c(
-           geno = "SnpMatrix",            # Genotype matrix
-           map = "MapDataFrameOrList",    # Marker map (single or list)
-           path = "character",            # File path or identifier
-           xref_path = "character"        # Per-individual paths
+           geno = "SnpMatrix",
+           map = "MapDataFrameOrList",
+           path = "character",
+           xref_path = "character"
          ))
 
-# Class for configuration of SNP file import
+
+#' SNPFileConfig Class
+#'
+#' A class for configuring SNP file import options.
+#'
+#' @slot path Path to the SNP file.
+#' @slot fields A list specifying column mappings or field configurations.
+#' @slot codes Character vector for genotype or allele codes.
+#' @slot threshold Numeric value for filtering or quality control.
+#' @slot sep Character specifying the field separator.
+#' @slot skip Number of lines to skip at the top of the file.
+#'
+#' @export
 setClass("SNPFileConfig",
          slots = c(
-           path = "character",    # File path
-           fields = "list",       # Field mapping or column specifications
-           codes = "character",   # Codes for genotype or allele representation
-           threshold = "numeric", # Quality or filtering threshold
-           sep = "character",     # Field separator
-           skip = "numeric"       # Number of lines to skip at the start
+           path = "character",
+           fields = "list",
+           codes = "character",
+           threshold = "numeric",
+           sep = "character",
+           skip = "numeric"
          ))
 
-# Class for storing a list of SNP file configurations
+
+#' SNPImportList Class
+#'
+#' A class for managing a list of SNP file import configurations.
+#'
+#' @slot configs A list of SNPFileConfig objects.
+#'
+#' @export
 setClass("SNPImportList",
          slots = c(
-           configs = "list"       # List of SNPFileConfig objects
+           configs = "list"
          ))
 
-# Class for preparing data export for FImpute
+
+#' FImputeExport Class
+#'
+#' A class to handle export preparation for FImpute.
+#'
+#' @slot geno A SnpMatrix or NULL containing genotype data.
+#' @slot map A data.frame containing marker information.
+#' @slot path Output file path.
+#' @slot name Project or file name.
+#'
+#' @export
 setClass("FImputeExport",
          slots = c(
-           geno = "SnpMatrixOrNULL", # Genotype matrix or NULL
-           map = "data.frame",       # Marker map
-           path = "character",       # Output file path
-           name = "character"        # File or project name
+           geno = "SnpMatrixOrNULL",
+           map = "data.frame",
+           path = "character",
+           name = "character"
          ))
 
-# Class for managing FImpute execution and results
+
+#' FImputeRunner Class
+#'
+#' A class to manage FImpute execution and results.
+#'
+#' @slot export An FImputeExport object.
+#' @slot par_file Path to parameter file.
+#' @slot exec_path Path to FImpute executable.
+#' @slot results A data.frame containing results or summary information.
+#'
+#' @export
 setClass("FImputeRunner",
          slots = c(
-           export = "FImputeExport", # FImpute export object
-           par_file = "character",   # Path to FImpute parameter file
-           exec_path = "character",  # Path to FImpute executable
-           results = "data.frame"    # Imputation results or summary
+           export = "FImputeExport",
+           par_file = "character",
+           exec_path = "character",
+           results = "data.frame"
          ))
