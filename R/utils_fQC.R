@@ -2,7 +2,7 @@
 # Functions from fQC package
 # Original author: Roberto Higa <roberto.higa@embrapa.br>
 # License: GPL-3
-# Copied and integrated into SNPtools by Vinícius, 2025
+# Copied and integrated into SNPtools by Vinicius, 2025
 # ================================================================
 
 #' Check SNP call rate
@@ -655,11 +655,11 @@ get.hwe.chi2 <- function(snp.summary) {
 #' Check SNPs for Hardy-Weinberg equilibrium deviation using chi-square p-values
 #'
 #' This function identifies SNP markers whose Hardy-Weinberg equilibrium (HWE) chi-square p-values
-#' indicate significant deviation beyond a specified threshold. It uses the p-values computed by 
+#' indicate significant deviation beyond a specified threshold. It uses the p-values computed by
 #' \code{get.hwe.chi2} on the input summary data frame.
 #'
-#' @param snp.summary A data frame or matrix containing summary statistics for SNP markers. 
-#'        The row names should correspond to SNP identifiers. It must be compatible with 
+#' @param snp.summary A data frame or matrix containing summary statistics for SNP markers.
+#'        The row names should correspond to SNP identifiers. It must be compatible with
 #'        the function \code{get.hwe.chi2}.
 #' @param max.dev A numeric value specifying the maximum acceptable p-value threshold.
 #'        SNPs with p-values below this threshold are considered as deviating from HWE.
@@ -676,7 +676,7 @@ get.hwe.chi2 <- function(snp.summary) {
 #' # snps_failed <- check.snp.hwe.chi2(snp.summary, max.dev = 0.05)
 #'
 #' @export
-check.snp.hwe.chi2 <- function (snp.summary, max.dev) 
+check.snp.hwe.chi2 <- function (snp.summary, max.dev)
 {
     pvalues <- get.hwe.chi2(snp.summary)
     result <- pvalues < max.dev

@@ -36,7 +36,7 @@ Depending on the action argument:
 - "both": list containing the filtered object and detailed report.
 }
 \description{
-Applies flexible quality control filters on an object of class \code{SNPDataLong}. 
+Applies flexible quality control filters on an object of class \code{SNPDataLong}.
 Supports call rate filtering, minor allele frequency (MAF), Hardy-Weinberg equilibrium (HWE),
 removal of monomorphic SNPs, exclusion of specific chromosomes, optionally removing SNPs without positions,
 and optionally removing SNPs at the same genomic position (keeping the one with highest MAF).

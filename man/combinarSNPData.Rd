@@ -14,7 +14,7 @@ A single \code{SNPDataLong} object containing the combined genotype matrix, merg
 and a concatenated path string.
 }
 \description{
-This function merges a list of \code{SNPDataLong} objects, typically representing different SNP panels 
+This function merges a list of \code{SNPDataLong} objects, typically representing different SNP panels
 or datasets, into a single unified \code{SNPDataLong} object. It ensures that all genotype matrices
 have the same set of SNPs (filling missing SNPs with NA), and merges the marker map information while
 removing duplicate SNP entries.

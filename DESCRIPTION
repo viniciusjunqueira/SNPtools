@@ -14,6 +14,10 @@ Depends:
     dplyr
 Imports:
     methods,
+    reshape2,
+    ggplot2,
+    dplyr,
+    tidyverse,
     data.table,
     Rcpp,
     stringi,
@@ -25,7 +29,7 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Encoding: UTF-8
-License: GPL-3
+License: GPL-3 + file LICENSE
 URL: https://viniciusjunqueira.github.io/SNPtools
 BugReports: https://github.com/viniciusjunqueira/SNPtools/issues
 RoxygenNote: 7.3.2

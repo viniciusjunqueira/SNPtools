@@ -22,7 +22,7 @@
 setGeneric("qcSamples", function(x, ...) standardGeneric("qcSamples"))
 
 #' @rdname qcSamples
-setMethod("qcSamples", "SNPDataLong", function(x, 
+setMethod("qcSamples", "SNPDataLong", function(x,
                                                heterozygosity = NULL,
                                                smp_cr = NULL,
                                                action = c("report", "filter", "both")) {
@@ -36,7 +36,7 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   # Verifica e trata amostras duplicadas
   dups_logical <- duplicated(rownames(geno))
   if (any(dups_logical)) {
-    message("\n⚠️  Duplicated sample identifiers detected in the SnpMatrix object.")
+    message("\nDuplicated sample identifiers detected in the SnpMatrix object.")
     message("   Only the first occurrence of each duplicated sample will be retained.")
     geno <- geno[!dups_logical, , drop = FALSE]
     if (!is.null(xref_path) && length(xref_path) == length(dups_logical)) {
@@ -44,13 +44,12 @@ setMethod("qcSamples", "SNPDataLong", function(x,
     }
   }
 
-  qc_header("🧬 Quality Control on Samples")
+  qc_header("Quality Control on Samples")
   message("Initial number of samples: ", nrow(geno))
   message("Applying quality control filters:")
 
   keep_samples <- rownames(geno)
 
-  # Estatísticas por indivíduo
   sample.qc <- row.summary(geno)
 
   removed_hetero <- removed_cr <- character()
@@ -58,14 +57,14 @@ setMethod("qcSamples", "SNPDataLong", function(x,
   if (!is.null(heterozygosity)) {
     removed_hetero <- check.sample.heterozygosity(sample.qc, heterozygosity)
     keep_samples <- setdiff(keep_samples, removed_hetero)
-    message(sprintf("  • Heterozygosity filter: %d sample(s) removed, %d remaining.",
+    message(sprintf("  - Heterozygosity filter: %d sample(s) removed, %d remaining.",
                     length(removed_hetero), length(keep_samples)))
   }
 
   if (!is.null(smp_cr)) {
     removed_cr <- check.sample.call.rate(sample.qc, smp_cr)
     keep_samples <- setdiff(keep_samples, removed_cr)
-    message(sprintf("  • Call rate filter: %d sample(s) removed, %d remaining.",
+    message(sprintf("  - Call rate filter: %d sample(s) removed, %d remaining.",
                     length(removed_cr), length(keep_samples)))
   }
 

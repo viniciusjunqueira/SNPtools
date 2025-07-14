@@ -7,8 +7,8 @@
 check.snp.hwe.chi2(snp.summary, max.dev)
 }
 \arguments{
-\item{snp.summary}{A data frame or matrix containing summary statistics for SNP markers. 
-The row names should correspond to SNP identifiers. It must be compatible with 
+\item{snp.summary}{A data frame or matrix containing summary statistics for SNP markers.
+The row names should correspond to SNP identifiers. It must be compatible with
 the function \code{get.hwe.chi2}.}
 
 \item{max.dev}{A numeric value specifying the maximum acceptable p-value threshold.
@@ -20,7 +20,7 @@ A character vector of SNP identifiers (rownames) that fail the HWE test (p-value
 }
 \description{
 This function identifies SNP markers whose Hardy-Weinberg equilibrium (HWE) chi-square p-values
-indicate significant deviation beyond a specified threshold. It uses the p-values computed by 
+indicate significant deviation beyond a specified threshold. It uses the p-values computed by
 \code{get.hwe.chi2} on the input summary data frame.
 }
 \details{

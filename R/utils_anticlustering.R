@@ -14,6 +14,7 @@
 #' df <- genoToDF(nelore_imputed, center = TRUE, scale = TRUE)
 #' head(df[, 1:5])
 #' }
+#' @importFrom methods as
 #' @export
 genoToDF <- function(object, center = FALSE, scale = FALSE) {
   if (!inherits(object, "SNPDataLong")) {
@@ -31,11 +32,11 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
   colnames(geno_df) <- colnames(object@geno)
 
   if (isTRUE(center) || isTRUE(scale) || is.numeric(center) || is.numeric(scale)) {
-    cat("⚖️ Applying centering and/or scaling to SNP columns...\n")
+    cat("Applying centering and/or scaling to SNP columns...\n")
     geno_df <- as.data.frame(scale(geno_df, center = center, scale = scale))
   }
 
-  cat("✅ Genotype data converted to data.frame with dimensions:",
+  cat("Genotype data converted to data.frame with dimensions:",
       nrow(geno_df), "x", ncol(geno_df), "\n")
 
   return(geno_df)
@@ -61,24 +62,26 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
 #' table(res$groups)
 #' }
+#' @importFrom stats prcomp
+#' @importFrom anticlust fast_anticlustering
 #' @export
 runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
   if (!inherits(object, "SNPDataLong")) {
-    stop("❌ Input object must be of class SNPDataLong.")
+    stop("Input object must be of class SNPDataLong.")
   }
 
   geno_df <- genoToDF(object, center = center, scale = scale)
-  cat("✅ Genotype data frame created for PCA.\n")
+  cat("Genotype data frame created for PCA.\n")
 
-  cat("⚡ Running PCA...\n")
+  cat("Running PCA...\n")
   pca_res <- prcomp(geno_df, center = FALSE, scale. = FALSE)
 
   top_pcs <- pca_res$x[, seq_len(n_pcs)]
-  cat("✅ Top", n_pcs, "PCs extracted.\n")
+  cat("Top", n_pcs, "PCs extracted.\n")
 
-  cat("⚖️ Running anticlustering with", K, "groups...\n")
+  cat("Running anticlustering with", K, "groups...\n")
   groups <- fast_anticlustering(top_pcs, K = K)
-  cat("✅ Anticlustering completed. Groups assigned.\n")
+  cat("Anticlustering completed. Groups assigned.\n")
 
   return(list(
     groups = groups,
@@ -101,6 +104,7 @@ runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale
 #' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
 #' plotPCAgroups(res$pca, res$groups)
 #' }
+#' @importFrom ggplot2 ggplot aes geom_point labs theme_minimal theme element_rect ggsave
 #' @export
 plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
   explained_var <- pca_res$sdev^2 / sum(pca_res$sdev^2)
@@ -126,7 +130,7 @@ plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
 
   if (!is.null(filename)) {
     ggsave(filename, p, width = 7, height = 5)
-    cat("✅ Plot saved to:", filename, "\n")
+    cat("Plot saved to:", filename, "\n")
   } else {
     print(p)
   }

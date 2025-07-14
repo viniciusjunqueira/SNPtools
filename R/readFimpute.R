@@ -85,22 +85,22 @@ read.fimpute <- function(file, method = c("R", "Rcpp")) {
 #' @export
 importFImputeResults <- function(path, method = "R") {
   if (!is.character(path) || length(path) != 1) {
-    stop("❌ 'path' must be a single character string.")
+    stop("'path' must be a single character string.")
   }
 
   output_dir <- file.path(path, "output_fimpute")
 
   if (!dir.exists(output_dir)) {
-    stop("❌ Output directory 'output_fimpute' does not exist at: ", output_dir)
+    stop("Output directory 'output_fimpute' does not exist at: ", output_dir)
   }
 
   if (!exists("read.fimpute", mode = "function")) {
     stop("The function 'read.fimpute()' must be defined and available in the current environment.")
   }
 
-  message("📥 Reading FImpute results from: ", output_dir)
+  message("Reading FImpute results from: ", output_dir)
   res <- read.fimpute(file = output_dir, method = method)
 
-  message("✔ Results successfully loaded as SNPDataLong object.")
+  message("Results successfully loaded as SNPDataLong object.")
   return(res)
 }
