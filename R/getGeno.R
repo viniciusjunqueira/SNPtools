@@ -1,3 +1,7 @@
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c("Name"))
+}
+
 #' Flexible and efficient genotype file reading with autodetection using fread
 #'
 #' Allows flexible import of SNP genotype data from Illumina FinalReport files,
@@ -15,131 +19,138 @@
 #' @param ... Additional optional arguments.
 #'
 #' @return An \code{SNPDataLong} object
+#'
+#' @importFrom utils read.table
+#' @importFrom dplyr %>% select
 #' @export
 setGeneric("getGeno", function(...) standardGeneric("getGeno"))
 
 #' @rdname getGeno
 #' @export
 setMethod("getGeno", signature(),
-  function(path,
-           fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9),
-           codes = c("A", "B"),
-           threshold = 0.15,
-           sep = "\t",
-           skip = 0,
-           verbose = TRUE,
-           every = NULL) {
+          function(path,
+                   fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9),
+                   codes = c("A", "B"),
+                   threshold = 0.15,
+                   sep = "\t",
+                   skip = 0,
+                   verbose = TRUE,
+                   every = NULL) {
 
-    if (!requireNamespace("data.table", quietly = TRUE)) {
-      stop("The 'data.table' package is required. Install it using install.packages('data.table').")
-    }
+            if (!requireNamespace("data.table", quietly = TRUE)) {
+              stop("The 'data.table' package is required. Install it using install.packages('data.table').")
+            }
 
-    if (!file.exists(file.path(path, "FinalReport.txt"))) {
-      warning("File FinalReport.txt not found at: ", path)
-      return(NULL)
-    }
+            if (!file.exists(file.path(path, "FinalReport.txt"))) {
+              warning("File FinalReport.txt not found at: ", path)
+              return(NULL)
+            }
 
-    # Fast initial read using fread to detect samples and SNPs
-    cols_to_read <- unique(unlist(fields[c("sample", "snp")]))
-    col_select <- as.integer(cols_to_read)
+            # Fast initial read using fread
+            cols_to_read <- unique(unlist(fields[c("sample", "snp")]))
+            col_select <- as.integer(cols_to_read)
 
-    fread_result <- tryCatch({
-      data.table::fread(
-        file = file.path(path, "FinalReport.txt"),
-        sep = sep,
-        skip = skip,
-        header = TRUE,
-        select = col_select,
-        data.table = FALSE,
-        colClasses = "character"
-      )
-    }, error = function(e) {
-      warning("Failed to read FinalReport.txt with fread: ", e$message)
-      return(NULL)
-    })
+            fread_result <- tryCatch({
+              data.table::fread(
+                file = file.path(path, "FinalReport.txt"),
+                sep = sep,
+                skip = skip,
+                header = TRUE,
+                select = col_select,
+                data.table = FALSE,
+                colClasses = "character"
+              )
+            }, error = function(e) {
+              warning("Failed to read FinalReport.txt with fread: ", e$message)
+              return(NULL)
+            })
 
-    if (is.null(fread_result)) return(NULL)
+            if (is.null(fread_result)) return(NULL)
 
-    sample.col <- match(fields$sample, col_select)
-    snp.col    <- match(fields$snp, col_select)
+            sample.col <- match(fields$sample, col_select)
+            snp.col    <- match(fields$snp, col_select)
 
-    sample.id <- unique(fread_result[[sample.col]])
-    snp.id    <- unique(fread_result[[snp.col]])
+            sample.id <- unique(fread_result[[sample.col]])
+            snp.id    <- unique(fread_result[[snp.col]])
 
-    if (length(sample.id) == 0) {
-      warning("Sample IDs could not be determined correctly; setting default numeric row names.")
-    }
-    if (length(snp.id) == 0) {
-      warning("SNP IDs could not be determined correctly; setting default numeric column names.")
-    }
+            if (length(sample.id) == 0) {
+              warning("Sample IDs could not be determined correctly; setting default numeric row names.")
+            }
+            if (length(snp.id) == 0) {
+              warning("SNP IDs could not be determined correctly; setting default numeric column names.")
+            }
 
-    if (is.null(every)) every <- length(snp.id)
+            if (is.null(every)) every <- length(snp.id)
 
-    # Full genotype matrix reading with snpStats
-    data <- tryCatch({
-      snpStats::read.snps.long(
-        file = file.path(path, "FinalReport.txt"),
-        sample.id = sample.id,
-        snp.id = snp.id,
-        fields = fields,
-        codes = codes,
-        threshold = threshold,
-        sep = sep,
-        skip = skip,
-        verbose = verbose,
-        every = every
-      )
-    }, error = function(e) {
-      warning("Error while running read.snps.long: ", e$message)
-      return(NULL)
-    })
+            # Full genotype matrix
+            data <- tryCatch({
+              snpStats::read.snps.long(
+                file = file.path(path, "FinalReport.txt"),
+                sample.id = sample.id,
+                snp.id = snp.id,
+                fields = fields,
+                codes = codes,
+                threshold = threshold,
+                sep = sep,
+                skip = skip,
+                verbose = verbose,
+                every = every
+              )
+            }, error = function(e) {
+              warning("Error while running read.snps.long: ", e$message)
+              return(NULL)
+            })
 
-    if (is.null(data)) return(NULL)
+            if (is.null(data)) return(NULL)
 
-    # Force row and column names
-    if (is.null(rownames(data))) {
-      rownames(data) <- sample.id
-    }
-    if (is.null(colnames(data))) {
-      colnames(data) <- snp.id
-    }
+            # Force row and column names
+            if (is.null(rownames(data))) {
+              rownames(data) <- sample.id
+            }
+            if (is.null(colnames(data))) {
+              colnames(data) <- snp.id
+            }
 
-    # Read map file
-    map_file <- file.path(path, "SNP_Map.txt")
-    if (!file.exists(map_file)) {
-      warning("SNP_Map.txt file not found at: ", path)
-      return(NULL)
-    }
+            # Read SNP map
+            map_file <- file.path(path, "SNP_Map.txt")
+            if (!file.exists(map_file)) {
+              warning("SNP_Map.txt file not found at: ", path)
+              return(NULL)
+            }
 
-    map <- tryCatch({
-      read.table(map_file, colClasses = "character", sep = sep, header = TRUE)
-    }, error = function(e) {
-      warning("Error reading SNP_Map.txt: ", e$message)
-      return(NULL)
-    })
+            map <- tryCatch({
+              utils::read.table(map_file, colClasses = "character", sep = sep, header = TRUE)
+            }, error = function(e) {
+              warning("Error reading SNP_Map.txt: ", e$message)
+              return(NULL)
+            })
 
-    if (is.null(map)) return(NULL)
+            if (is.null(map)) return(NULL)
 
-    # Check which chromosome column exists
-    possible_chr_cols <- c("Chromosome", "Chr")
-    chr_name <- intersect(possible_chr_cols, colnames(map))
+            # Chromosome column name
+            possible_chr_cols <- c("Chromosome", "Chr")
+            chr_name <- intersect(possible_chr_cols, colnames(map))
 
-    if (length(chr_name) == 0) {
-      stop("No chromosome column found (expected 'Chromosome' or 'Chr') on map file.")
-    } else {
-      chr_name <- chr_name[1]  # Use the first one found
-    }
+            if (length(chr_name) == 0) {
+              stop("No chromosome column found (expected 'Chromosome' or 'Chr') on map file.")
+            } else {
+              chr_name <- chr_name[1]
+            }
 
-    # Select columns of interest
-    map <- map %>%
-      dplyr::select(Name, !!chr_name, Position)
+            # Select columns
+            map <- map %>%
+              dplyr::select(Name, !!chr_name, Position)
 
-    new("SNPDataLong",
-        geno = data,
-        map  = map,
-        path = path)
-  }
+            new("SNPDataLong",
+                geno = data,
+                map  = map,
+                path = path)
+          }
 )
+
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c("combineSNPData"))
+}
 
 #' Import and combine multiple genotype configurations
 #'
@@ -149,20 +160,35 @@ setMethod("getGeno", signature(),
 #' @param object An \code{SNPImportList} object.
 #'
 #' @return A combined \code{SNPDataLong} object.
+#'
+#' @importFrom SNPtools combineSNPData
 #' @export
 setGeneric("importAllGenos", function(object) standardGeneric("importAllGenos"))
 
 #' @rdname importAllGenos
 #' @export
 setMethod("importAllGenos", "SNPImportList", function(object) {
+  if (!inherits(object, "SNPImportList")) {
+    stop("Input must be of class SNPImportList.")
+  }
+
   all_genos <- lapply(object@configs, function(cfg) {
-    tryCatch(getGeno(cfg), error = function(e) {
-      warning("Error in getGeno(): ", e$message)
-      NULL
-    })
+    tryCatch(
+      getGeno(cfg),
+      error = function(e) {
+        warning("Error in getGeno(): ", e$message)
+        NULL
+      }
+    )
   })
 
   all_genos <- Filter(Negate(is.null), all_genos)
-  if (length(all_genos) == 0) stop("No genotype data was successfully imported.")
-  combinarSNPData(all_genos)
+
+  if (length(all_genos) == 0) {
+    stop("No genotype data was successfully imported.")
+  }
+
+  combined <- combineSNPData(all_genos)
+
+  return(combined)
 })

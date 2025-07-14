@@ -24,5 +24,5 @@ check.sample.heterozygosity(ss, 1)
 
 }
 \author{
-Roberto Higa
+Roberto Higa, adapted by Vinicius Junqueira
 }

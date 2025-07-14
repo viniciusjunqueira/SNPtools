@@ -15,7 +15,7 @@ runFImpute(object, verbose = TRUE)
 \item{verbose}{Logical. If TRUE (default), FImpute output will be printed to the console.}
 }
 \value{
-An updated `FImputeRunner` object with the `results` slot populated (SnpMatrix).
+An updated `FImputeRunner` object with the `results` slot populated (SNPDataLong).
 }
 \description{
 This function runs the external FImpute software using a `FImputeRunner` object,
@@ -40,6 +40,6 @@ runner <- new("FImputeRunner",
               exec_path = fimpute_exec)
 
 runner <- runFImpute(runner, verbose = TRUE)
-head(runner@results)
+head(runner@results@geno)
 }
 }

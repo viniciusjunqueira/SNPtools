@@ -7,24 +7,19 @@
 #' @author
 #' Vinícius Junqueira \email{junqueiravinicius@hotmail.com}
 #'
-#' @importFrom grDevices dev.off jpeg
-#' @importFrom graphics hist par text
-#' @importFrom methods new as
-#' @importFrom stats dist hclust pchisq prcomp sd
-#' @importFrom utils read.table write.table
-#' @importFrom magrittr %>%
-#' @importFrom snpStats col.summary row.summary snp.pre.multiply snp.post.multiply
-#' @importFrom MASS isoMDS
-#' @importFrom reshape2 acast
-#' @importFrom anticlust fast_anticlustering
-#' @importFrom dplyr select
-#' @importFrom ggplot2 ggplot aes geom_point labs theme_minimal theme element_rect ggsave
-#' @importClassesFrom snpStats SnpMatrix
+#' @import grDevices
+#' @import graphics
+#' @import methods
+#' @import stats
+#' @import utils
+#' @import magrittr
+#' @import MASS
+#' @import reshape2
+#' @import anticlust
+#' @import dplyr select
+#' @import ggplot2
+#' @import snpStats
 "_PACKAGE"
-
-if (getRversion() >= "2.15.1") {
-  utils::globalVariables(c("Name", "PC1", "PC2", "Group"))
-}
 
 dummy_imports <- function() {
   MASS::isoMDS

@@ -7,7 +7,7 @@
 #' @param object An object of class `FImputeRunner`.
 #' @param verbose Logical. If TRUE (default), FImpute output will be printed to the console.
 #'
-#' @return An updated `FImputeRunner` object with the `results` slot populated (SnpMatrix).
+#' @return An updated `FImputeRunner` object with the `results` slot populated (SNPDataLong).
 #' @examples
 #' \dontrun{
 #' # Example: Running FImpute from a FImputeRunner object
@@ -27,8 +27,9 @@
 #'               exec_path = fimpute_exec)
 #'
 #' runner <- runFImpute(runner, verbose = TRUE)
-#' head(runner@results)
+#' head(runner@results@geno)
 #' }
+#' @importFrom methods new
 #' @export
 setGeneric("runFImpute", function(object, verbose = TRUE) standardGeneric("runFImpute"))
 
@@ -89,13 +90,9 @@ setMethod("runFImpute", "FImputeRunner", function(object, verbose = TRUE) {
 
   res <- read.fimpute(file = output_dir)
 
-  # if (!inherits(res, "SnpMatrix")) {
-    # stop("The function 'read.fimpute()' did not return a SnpMatrix object. Please verify its behavior.")
-  # }
-
-  message("Results successfully read and stored in 'results' slot of FImputeRunner.")
-  object <- res
+  # Armazena objeto completo SNPDataLong no slot results
   # object@results <- res
 
-  return(object)
+  message("Results successfully read and stored in 'results' slot of FImputeRunner.")
+  return(res)
 })

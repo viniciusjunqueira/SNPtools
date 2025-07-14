@@ -75,7 +75,7 @@ setMethod("qcSNPs", "SNPDataLong", function(x,
   message("Initial number of SNPs: ", length(keep_snps))
   message("Applying quality control filters...")
 
-  snpsum <- col.summary(geno)
+  snpsum <- snpStats::col.summary(geno)
 
   # Initialize vectors to store SNPs to be removed
   low_callrate_snps <- low_maf <- dev.hwe <- mono <- discard_chr <- snpstoremove <- no_pos <- character()

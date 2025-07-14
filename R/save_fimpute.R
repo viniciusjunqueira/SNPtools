@@ -50,6 +50,7 @@ setMethod("saveFImpute", "SNPDataLong", function(object, path = NULL) {
 #' @param path Output directory.
 #' @param xref Optional vector of identifiers per individual (used to assign numeric chip IDs).
 #'
+#' @importFrom utils write.table
 #' @export
 saveFImputeRaw <- function(geno, map, path, xref = NULL) {
   save_fimpute_raw(geno, map, path, xref = xref)
@@ -184,7 +185,7 @@ save_fimpute_raw <- function(genotype, map, path, xref = NULL) {
     stringsAsFactors = FALSE
   )
 
-  write.table(
+  utils::write.table(
     map_out,
     file = map_file,
     quote = FALSE,

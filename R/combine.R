@@ -86,20 +86,19 @@ rbind_SnpMatrix <- function(...) {
 #'
 #' @examples
 #' \dontrun{
-#' combined <- combinarSNPData(list(snp_obj1, snp_obj2, snp_obj3))
+#' combined <- combineSNPData(list(snp_obj1, snp_obj2, snp_obj3))
 #' }
 #'
+#' @importFrom methods new as
 #' @export
-combinarSNPData <- function(lista) {
+combineSNPData <- function(lista) {
   stopifnot(length(lista) > 0)
 
   message("Starting SNPDataLong combination...")
 
-  # Get the union of all SNP names across objects
   snps_all <- Reduce(union, lapply(lista, function(x) colnames(x@geno)))
   message("Unified SNP panel with ", length(snps_all), " SNPs.")
 
-  # Ensure each genotype matrix has all SNPs (fill missing SNPs with NAs)
   geno_list <- lapply(lista, function(x) {
     geno <- x@geno
     missing_snps <- setdiff(snps_all, colnames(geno))
@@ -112,38 +111,33 @@ combinarSNPData <- function(lista) {
       geno <- cbind_SnpMatrix(geno, na_block)
     }
 
-    # Reorder columns
     geno <- geno[, snps_all, drop = FALSE]
 
-    # Ensure row names exist
     if (is.null(rownames(geno)) || any(rownames(geno) == "")) {
+      warning("Some samples had missing rownames. Assigned default sample names.")
       rownames(geno) <- sprintf("Sample_%d", seq_len(nrow(geno)))
-    }
-
-    # Ensure column names
-    if (is.null(colnames(geno)) || any(colnames(geno) == "")) {
-      colnames(geno) <- snps_all
     }
 
     geno
   })
 
-  # Combine matrices using safe rbind
   geno_comb <- do.call(rbind_SnpMatrix, geno_list)
 
-  # Combine marker maps and remove duplicates
   map_all <- do.call(rbind, lapply(lista, function(x) x@map))
   map_all <- map_all[!duplicated(map_all$Name), , drop = FALSE]
   map_final <- map_all[match(snps_all, map_all$Name), , drop = FALSE]
 
-  # Validate and coerce if needed
+  if (any(is.na(map_final$Name))) {
+    missing_snps <- snps_all[is.na(match(snps_all, map_all$Name))]
+    warning("Some SNPs missing in combined map: ", paste(missing_snps, collapse = ", "))
+  }
+
   if (!inherits(geno_comb, "SnpMatrix")) {
-    geno_comb <- methods::as(geno_comb, "SnpMatrix")
+    geno_comb <- as(geno_comb, "SnpMatrix")
   }
 
   message("Combination complete. Final matrix: ", nrow(geno_comb), " samples x ", ncol(geno_comb), " SNPs.")
 
-  # Return new object
   new("SNPDataLong",
       geno = geno_comb,
       map  = map_final,

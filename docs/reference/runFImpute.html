@@ -82,7 +82,7 @@ ensuring that all required input files are present and the results are imported.
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An updated `FImputeRunner` object with the `results` slot populated (SnpMatrix).</p>
+    <p>An updated `FImputeRunner` object with the `results` slot populated (SNPDataLong).</p>
     </div>
 
     <div id="ref-examples">
@@ -105,7 +105,7 @@ ensuring that all required input files are present and the results are imported.
 <span class="r-in"><span>              exec_path <span class="op">=</span> <span class="va">fimpute_exec</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">runner</span> <span class="op">&lt;-</span> <span class="fu">runFImpute</span><span class="op">(</span><span class="va">runner</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">runner</span><span class="op">@</span><span class="va">results</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">runner</span><span class="op">@</span><span class="va">results</span><span class="op">@</span><span class="va">geno</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

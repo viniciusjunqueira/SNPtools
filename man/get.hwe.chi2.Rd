@@ -21,5 +21,5 @@ get.hwe.chi2(df)
 
 }
 \author{
-Roberto Higa
+Roberto Higa, adapted by Vinicius Junqueira
 }

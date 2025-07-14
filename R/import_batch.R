@@ -93,7 +93,7 @@ import_geno_list <- function(config_list) {
   }
 
   # Combine genotype matrices (custom function you already have)
-  combined <- combinarSNPData(results)
+  combined <- combineSNPData(results)
 
   # Combine xref paths
   all_xref_paths <- unlist(lapply(results, function(x) x@xref_path), use.names = FALSE)

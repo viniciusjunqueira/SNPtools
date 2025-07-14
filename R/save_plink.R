@@ -9,10 +9,12 @@
 #' @param chunk_size Integer. Number of individuals per chunk for writing .ped file (default: 1000).
 #'
 #' @return No return value. Files are saved to disk.
+#'
 #' @examples
 #' \dontrun{
 #' savePlink(genotypes_qc, path = "plink_out", name = "nelore_qc", run_plink = TRUE, chunk_size = 2000)
 #' }
+#' @importFrom utils write.table
 #' @export
 savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink = TRUE, chunk_size = 1000) {
   if (!inherits(object, "SNPDataLong")) {
@@ -64,20 +66,21 @@ savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink
   map_out <- data.frame(
     Chromosome = map$Chromosome,
     SNP_ID = map$Name,
+    Genetic_distance = 0,
     Position = map$Position,
     stringsAsFactors = FALSE
   )
-  write.table(map_out, map_file, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+  utils::write.table(map_out, map_file, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
   cat(".map file written:", map_file, "\n")
 
   ## ----- Optionally run PLINK -----
   if (run_plink) {
     cat("Running PLINK to generate binary files...\n")
-    cmd <- paste("cd", shQuote(path), "&& plink1 --file", shQuote(name), "--out", shQuote(name), "--make-bed --map3 --noweb")
+    cmd <- paste("cd", shQuote(path), "&& plink1 --file", shQuote(name), "--out", shQuote(name), "--make-bed --noweb")
     status <- system(cmd)
 
     if (status == 0) {
-      cat("LINK binary files created successfully.\n")
+      cat("PLINK binary files created successfully.\n")
     } else {
       cat("PLINK execution failed. Please check your installation and logs.\n")
     }

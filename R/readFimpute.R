@@ -15,7 +15,8 @@ NULL
 #' \dontrun{
 #' snp_long <- read.fimpute("output_fimpute", method = "R")
 #' }
-#' @importClassesFrom snpStats SnpMatrix
+#'
+#' @import snpStats
 #' @export
 read.fimpute <- function(file, method = c("R", "Rcpp")) {
   method <- match.arg(method)
