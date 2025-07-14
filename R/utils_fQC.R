@@ -525,14 +525,14 @@ pairs2sets <- function(pairs) {
 #' @author Roberto Higa
 #' @export
 doPCA <- function(genotypes) {
-  xxmat <- xxt(genotypes, correct.for.missing = FALSE)
+  xxmat <- snpStats::xxt(genotypes, correct.for.missing = FALSE)
   evv <- eigen(xxmat, symmetric = TRUE)
   pcs <- evv$vectors
   evals <- evv$values
   print("Eigenvalues near zero set to zero (|eigenvalue| < 1e-3)")
   evals[abs(evals) < 0.001] <- 0
-  btr <- snp.pre.multiply(genotypes, diag(1/sqrt(evals)) %*% t(pcs))
-  pcs <- snp.post.multiply(genotypes, t(btr))
+  btr <- snpStats::snp.pre.multiply(genotypes, diag(1/sqrt(evals)) %*% t(pcs))
+  pcs <- snpStats::snp.post.multiply(genotypes, t(btr))
   return(list(pcs = pcs, eigen = evals))
 }
 

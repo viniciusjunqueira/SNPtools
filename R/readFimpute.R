@@ -1,5 +1,6 @@
 #' @useDynLib SNPtools, .registration = TRUE
 #' @importFrom Rcpp evalCpp
+#' @importClassesFrom snpStats SnpMatrix
 NULL
 
 #' Read imputed genotypes from FImpute output and return SNPDataLong object
@@ -16,7 +17,6 @@ NULL
 #' snp_long <- read.fimpute("output_fimpute", method = "R")
 #' }
 #'
-#' @import snpStats
 #' @export
 read.fimpute <- function(file, method = c("R", "Rcpp")) {
   method <- match.arg(method)

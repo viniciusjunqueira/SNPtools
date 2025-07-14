@@ -6,19 +6,6 @@
 #' @name SNPtools
 #' @author
 #' Vinícius Junqueira \email{junqueiravinicius@hotmail.com}
-#'
-#' @import grDevices
-#' @import graphics
-#' @import methods
-#' @import stats
-#' @import utils
-#' @import magrittr
-#' @import MASS
-#' @import reshape2
-#' @import anticlust
-#' @import dplyr select
-#' @import ggplot2
-#' @import snpStats
 "_PACKAGE"
 
 dummy_imports <- function() {

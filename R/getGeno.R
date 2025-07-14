@@ -161,7 +161,6 @@ if (getRversion() >= "2.15.1") {
 #'
 #' @return A combined \code{SNPDataLong} object.
 #'
-#' @importFrom SNPtools combineSNPData
 #' @export
 setGeneric("importAllGenos", function(object) standardGeneric("importAllGenos"))
 

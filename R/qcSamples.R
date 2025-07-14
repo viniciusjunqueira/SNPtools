@@ -51,7 +51,7 @@ setMethod("qcSamples", "SNPDataLong", function(x,
 
   keep_samples <- rownames(geno)
 
-  sample.qc <- row.summary(geno)
+  sample.qc <- snpStats::row.summary(geno)
 
   removed_hetero <- removed_cr <- character()
 

@@ -25,7 +25,7 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
     stop("Input object must be of class SNPDataLong.")
   }
 
-  snpsum <- col.summary(object = object@geno)
+  snpsum <- snpStats::col.summary(object = object@geno)
   mono <- check.snp.monomorf(snpsum)
   object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
 
