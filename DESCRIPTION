@@ -9,9 +9,7 @@ Description: SNPtools provides an integrated suite of tools for handling SNP gen
 Logo: man/figures/logo.png
 Depends:
     R (>= 4.1.0),
-    snpStats,
-    tidyverse,
-    dplyr
+    snpStats
 Imports:
     methods,
     reshape2,

@@ -397,18 +397,20 @@ check.snp.no.position <- function(snpmap) {
 #' @export
 check.snp.same.position <- function(snpmap) {
   chromo <- unique(snpmap[, "Chromosome"])
-  n <- length(chromo)
   snps <- list()
   k <- 1
-  for (i in 1:n) {
-    print(paste("Analyzing chromosome ", chromo[i]))
-    snpmap.chr <- snpmap[snpmap[, "Chromosome"] == chromo[i], ]
+  for (chr in chromo) {
+    message("Analyzing chromosome ", chr)
+    snpmap.chr <- snpmap[snpmap[, "Chromosome"] == chr, ]
     sorted.snpmap.chr <- snpmap.chr[order(snpmap.chr[, "Position"]), ]
-    m <- dim(sorted.snpmap.chr)[1]
+    m <- nrow(sorted.snpmap.chr)
+
     for (j in 1:(m - 1)) {
       j1 <- j + 1
-      if (sorted.snpmap.chr[j, "Position"] == sorted.snpmap.chr[j1, "Position"]) {
-        print(paste("SNPs in same position: ", sorted.snpmap.chr[j, "Name"], " - ", sorted.snpmap.chr[j1, "Name"]))
+
+      if (isTRUE(sorted.snpmap.chr[j, "Position"] == sorted.snpmap.chr[j1, "Position"])) {
+        # message("SNPs in same position: ", sorted.snpmap.chr[j, "Name"], " - ", sorted.snpmap.chr[j1, "Name"])
+
         if (length(snps) < k) {
           snps[[k]] <- c(as.character(sorted.snpmap.chr[j, "Name"]), as.character(sorted.snpmap.chr[j1, "Name"]))
         } else {
@@ -423,6 +425,7 @@ check.snp.same.position <- function(snpmap) {
   }
   return(snps)
 }
+
 
 #' IBS pair statistics
 #'
