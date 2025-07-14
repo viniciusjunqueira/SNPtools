@@ -393,7 +393,7 @@ check.snp.no.position <- function(snpmap) {
 #' df <- data.frame(Chromosome = c(1, 1, 2), Position = c(100, 100, 200), Name = c("SNP1", "SNP2", "SNP3"))
 #' check.snp.same.position(df)
 #'
-#' @author Roberto Higa
+#' @author Roberto Higa, adaptaded by Vinicius Junqueira
 #' @export
 check.snp.same.position <- function(snpmap) {
   chromo <- unique(snpmap[, "Chromosome"])
