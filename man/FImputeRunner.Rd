@@ -7,19 +7,17 @@
 FImputeRunner(object, path, exec_path = "FImpute3", name = "data")
 }
 \arguments{
+\item{object}{An object of class `SNPDataLong`, from which `geno` and `map` slots will be extracted.}
+
 \item{path}{A character string indicating the directory to save FImpute files.}
 
 \item{exec_path}{Path to the FImpute executable (default = "FImpute3").}
 
-\item{name}{Name for the dataset (used internally, default = "gen_data").}
-
-\item{geno}{A SnpMatrix object.}
-
-\item{map}{A data.frame with SNP metadata (columns: Name, Chromosome, Position).}
+\item{name}{Name for the dataset (used internally, default = "data").}
 }
 \value{
 An object of class `FImputeRunner`.
 }
 \description{
-A convenience function to construct a `FImputeRunner` object from basic inputs.
+A convenience function to construct a `FImputeRunner` object from a `SNPDataLong` object.
 }

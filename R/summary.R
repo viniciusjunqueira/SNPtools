@@ -4,6 +4,8 @@
 #' proportion of missing data, and SNP distribution by chromosome if mapping information is available.
 #'
 #' @param object An object of class \code{SNPDataLong}.
+#' @param ... Further arguments passed to methods.
+#'
 #' @return Prints a summary to the console. Returns \code{NULL} (invisible).
 #' @export
 setMethod("summary", "SNPDataLong", function(object, ...) {

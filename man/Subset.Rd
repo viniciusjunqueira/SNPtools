@@ -2,22 +2,26 @@
 % Please edit documentation in R/utils_geno.R
 \name{Subset}
 \alias{Subset}
-\title{Subset method for SNPDataLong}
+\alias{Subset,SNPDataLong-method}
+\title{Subset an SNPDataLong object}
 \usage{
 Subset(object, index, margin = 1, keep = TRUE)
+
+\S4method{Subset}{SNPDataLong}(object, index, margin = 1, keep = TRUE)
 }
 \arguments{
-\item{object}{A SNPDataLong object.}
+\item{object}{A \code{SNPDataLong} object.}
 
 \item{index}{Character vector with row (individual) or column (SNP) names to filter.}
 
 \item{margin}{Integer: 1 = rows (individuals), 2 = columns (SNPs).}
 
-\item{keep}{Logical: TRUE to keep specified levels, FALSE to discard them.}
+\item{keep}{Logical; if \code{TRUE}, keeps the specified names; if \code{FALSE}, removes them.}
 }
 \value{
-A new SNPDataLong object, subsetted accordingly.
+A new \code{SNPDataLong} object, subsetted accordingly.
 }
 \description{
-Subset method for SNPDataLong
+Subsets an \code{SNPDataLong} object by rows (individuals) or columns (SNPs).
+You can specify which individuals or SNP markers to keep or remove.
 }

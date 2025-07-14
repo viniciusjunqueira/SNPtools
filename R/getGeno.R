@@ -1,22 +1,25 @@
 #' Flexible and efficient genotype file reading with autodetection using fread
 #'
-#' This generic and method allow flexible import of SNP genotype data from Illumina FinalReport files,
-#' supporting fast initial column detection using \code{data.table::fread}, followed by full genotype
-#' matrix construction via \code{snpStats::read.snps.long}.
+#' Allows flexible import of SNP genotype data from Illumina FinalReport files,
+#' using fast initial column detection via \code{data.table::fread}, followed by
+#' full genotype matrix construction with \code{snpStats::read.snps.long}.
 #'
 #' @param path Path to the directory containing \code{FinalReport.txt}
-#' @param fields A list specifying column indices for sample, SNP, allele1, allele2, and confidence
-#' @param codes A character vector with allele codes (e.g., \code{c("A", "B")})
-#' @param threshold Confidence threshold for genotype calling
-#' @param sep Field separator used in the files
-#' @param skip Number of lines to skip at the start of the file
-#' @param verbose Logical; if \code{TRUE}, displays progress messages
-#' @param every Frequency of progress update (number of SNPs)
+#' @param fields List specifying column indices (sample, snp, allele1, allele2, confidence)
+#' @param codes Allele codes (e.g., \code{c("A", "B")})
+#' @param threshold Confidence threshold
+#' @param sep Field separator
+#' @param skip Lines to skip
+#' @param verbose Logical; show progress
+#' @param every Frequency for progress updates
+#' @param ... Additional optional arguments.
 #'
-#' @return An \code{SNPDataLong} object containing the genotype matrix and map, or \code{NULL} if an error occurs
+#' @return An \code{SNPDataLong} object
 #' @export
 setGeneric("getGeno", function(...) standardGeneric("getGeno"))
 
+#' @rdname getGeno
+#' @export
 setMethod("getGeno", signature(),
   function(path,
            fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9),
@@ -140,15 +143,17 @@ setMethod("getGeno", signature(),
 
 #' Import and combine multiple genotype configurations
 #'
-#' This generic and method import genotype data from multiple configurations defined in an
-#' \code{SNPImportList} object, then combine them into a single unified \code{SNPDataLong} object.
+#' Imports genotype data from multiple configurations defined in an
+#' \code{SNPImportList} object and combines them into a unified \code{SNPDataLong} object.
 #'
-#' @param object An object of class \code{SNPImportList} containing import configurations
+#' @param object An \code{SNPImportList} object.
 #'
-#' @return A single combined \code{SNPDataLong} object
+#' @return A combined \code{SNPDataLong} object.
 #' @export
 setGeneric("importAllGenos", function(object) standardGeneric("importAllGenos"))
 
+#' @rdname importAllGenos
+#' @export
 setMethod("importAllGenos", "SNPImportList", function(object) {
   all_genos <- lapply(object@configs, function(cfg) {
     tryCatch(getGeno(cfg), error = function(e) {

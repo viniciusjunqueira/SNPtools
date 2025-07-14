@@ -2,12 +2,29 @@
 % Please edit documentation in R/qcSNPs.R
 \name{qcSNPs}
 \alias{qcSNPs}
+\alias{qcSNPs,SNPDataLong-method}
 \title{Quality Control for SNPDataLong with optional criteria}
 \usage{
 qcSNPs(x, ...)
+
+\S4method{qcSNPs}{SNPDataLong}(
+  x,
+  missing_ind = NULL,
+  missing_snp = NULL,
+  min_snp_cr = NULL,
+  min_maf = NULL,
+  hwe = NULL,
+  snp_position = NULL,
+  no_position = NULL,
+  snp_mono = FALSE,
+  remove_chr = NULL,
+  action = c("report", "filter", "both")
+)
 }
 \arguments{
 \item{x}{An object of class SNPDataLong.}
+
+\item{...}{Additional optional arguments.}
 
 \item{missing_ind}{Maximum allowed proportion of missing data per individual (currently not implemented).}
 
@@ -44,15 +61,26 @@ and optionally removing SNPs at the same genomic position (keeping the one with 
 \examples{
 \dontrun{
 set.seed(123)
-mat <- matrix(sample(c(0, 1, 2, NA), 100, replace = TRUE, prob = c(0.4, 0.4, 0.15, 0.05)),
+mat <- matrix(sample(c(0, 1, 2, NA), 100,
+              replace = TRUE, prob = c(0.4, 0.4, 0.15, 0.05)),
               nrow = 10, ncol = 10)
 colnames(mat) <- paste0("snp", 1:10)
 rownames(mat) <- paste0("ind", 1:10)
 map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
-x <- new("SNPDataLong", geno = mat, map = map, path = "dummy_path", xref_path = rep("chip1", 10))
+x <- new("SNPDataLong",
+         geno = mat,
+         map = map,
+         path = "dummy_path",
+         xref_path = rep("chip1", 10))
 
 # Example using multiple filters
-qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "filter")
+qcSNPs(x,
+       min_snp_cr = 0.8,
+       min_maf = 0.05,
+       snp_mono = TRUE,
+       no_position = TRUE,
+       snp_position = TRUE,
+       action = "filter")
 }
 
 }

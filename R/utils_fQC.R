@@ -390,7 +390,9 @@ check.snp.no.position <- function(snpmap) {
 #' @return List of SNP groups sharing positions.
 #'
 #' @examples
-#' df <- data.frame(Chromosome = c(1, 1, 2), Position = c(100, 100, 200), Name = c("SNP1", "SNP2", "SNP3"))
+#' df <- data.frame(Chromosome = c(1, 1, 2),
+#'                  Position = c(100, 100, 200),
+#'                  Name = c("SNP1", "SNP2", "SNP3"))
 #' check.snp.same.position(df)
 #'
 #' @author Roberto Higa, adaptaded by Vinicius Junqueira

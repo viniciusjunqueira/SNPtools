@@ -14,7 +14,6 @@
 #' df <- genoToDF(nelore_imputed, center = TRUE, scale = TRUE)
 #' head(df[, 1:5])
 #' }
-#' @importFrom methods as
 #' @export
 genoToDF <- function(object, center = FALSE, scale = FALSE) {
   if (!inherits(object, "SNPDataLong")) {
@@ -62,8 +61,6 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
 #' table(res$groups)
 #' }
-#' @importFrom stats prcomp
-#' @importFrom anticlust fast_anticlustering
 #' @export
 runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
   if (!inherits(object, "SNPDataLong")) {
@@ -104,7 +101,6 @@ runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale
 #' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
 #' plotPCAgroups(res$pca, res$groups)
 #' }
-#' @importFrom ggplot2 ggplot aes geom_point labs theme_minimal theme element_rect ggsave
 #' @export
 plotPCAgroups <- function(pca_res, groups, pcs = c(1, 2), filename = NULL) {
   explained_var <- pca_res$sdev^2 / sum(pca_res$sdev^2)

@@ -17,6 +17,8 @@ qcSamples(x, ...)
 \arguments{
 \item{x}{An object of class `SNPDataLong`.}
 
+\item{...}{Additional optional arguments.}
+
 \item{heterozygosity}{A numeric threshold or range for heterozygosity. Samples outside this threshold are removed.}
 
 \item{smp_cr}{Minimum acceptable sample call rate (between 0 and 1). Samples below this value are removed.}

@@ -2,32 +2,46 @@
 % Please edit documentation in R/getGeno.R
 \name{getGeno}
 \alias{getGeno}
+\alias{getGeno,ANY-method}
 \title{Flexible and efficient genotype file reading with autodetection using fread}
 \usage{
 getGeno(...)
+
+\S4method{getGeno}{ANY}(
+  path,
+  fields = list(sample = 2, snp = 1, allele1 = 7, allele2 = 8, confidence = 9),
+  codes = c("A", "B"),
+  threshold = 0.15,
+  sep = "\\t",
+  skip = 0,
+  verbose = TRUE,
+  every = NULL
+)
 }
 \arguments{
+\item{...}{Additional optional arguments.}
+
 \item{path}{Path to the directory containing \code{FinalReport.txt}}
 
-\item{fields}{A list specifying column indices for sample, SNP, allele1, allele2, and confidence}
+\item{fields}{List specifying column indices (sample, snp, allele1, allele2, confidence)}
 
-\item{codes}{A character vector with allele codes (e.g., \code{c("A", "B")})}
+\item{codes}{Allele codes (e.g., \code{c("A", "B")})}
 
-\item{threshold}{Confidence threshold for genotype calling}
+\item{threshold}{Confidence threshold}
 
-\item{sep}{Field separator used in the files}
+\item{sep}{Field separator}
 
-\item{skip}{Number of lines to skip at the start of the file}
+\item{skip}{Lines to skip}
 
-\item{verbose}{Logical; if \code{TRUE}, displays progress messages}
+\item{verbose}{Logical; show progress}
 
-\item{every}{Frequency of progress update (number of SNPs)}
+\item{every}{Frequency for progress updates}
 }
 \value{
-An \code{SNPDataLong} object containing the genotype matrix and map, or \code{NULL} if an error occurs
+An \code{SNPDataLong} object
 }
 \description{
-This generic and method allow flexible import of SNP genotype data from Illumina FinalReport files,
-supporting fast initial column detection using \code{data.table::fread}, followed by full genotype
-matrix construction via \code{snpStats::read.snps.long}.
+Allows flexible import of SNP genotype data from Illumina FinalReport files,
+using fast initial column detection via \code{data.table::fread}, followed by
+full genotype matrix construction with \code{snpStats::read.snps.long}.
 }

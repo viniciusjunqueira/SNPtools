@@ -13,7 +13,6 @@
 #' \dontrun{
 #' savePlink(genotypes_qc, path = "plink_out", name = "nelore_qc", run_plink = TRUE, chunk_size = 2000)
 #' }
-#' @importClassesFrom snpStats SnpMatrix
 #' @export
 savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink = TRUE, chunk_size = 1000) {
   if (!inherits(object, "SNPDataLong")) {

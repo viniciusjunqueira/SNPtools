@@ -10,6 +10,7 @@
 #'   - `"report"`: only returns a list of samples to remove and those kept;
 #'   - `"filter"`: returns a filtered object without reporting;
 #'   - `"both"`: performs filtering and returns the filtered object.
+#' @param ... Additional optional arguments.
 #'
 #' @return Depending on the `action` argument:
 #'   - `"report"`: returns a list with removed and kept samples;

@@ -9,7 +9,6 @@
 #' \dontrun{
 #' combined <- rbindSnpFlexible(brangus_geno, batch_BM@geno)
 #' }
-#' @importClassesFrom snpStats SnpMatrix
 #' @export
 rbindSnpFlexible <- function(...) {
   matrices <- list(...)
@@ -59,16 +58,22 @@ rbindSnpFlexible <- function(...) {
   return(combined)
 }
 
-#' Subset method for SNPDataLong
+#' Subset an SNPDataLong object
 #'
-#' @param object A SNPDataLong object.
+#' Subsets an \code{SNPDataLong} object by rows (individuals) or columns (SNPs).
+#' You can specify which individuals or SNP markers to keep or remove.
+#'
+#' @param object A \code{SNPDataLong} object.
 #' @param index Character vector with row (individual) or column (SNP) names to filter.
 #' @param margin Integer: 1 = rows (individuals), 2 = columns (SNPs).
-#' @param keep Logical: TRUE to keep specified levels, FALSE to discard them.
-#' @return A new SNPDataLong object, subsetted accordingly.
+#' @param keep Logical; if \code{TRUE}, keeps the specified names; if \code{FALSE}, removes them.
+#'
+#' @return A new \code{SNPDataLong} object, subsetted accordingly.
 #' @export
 setGeneric("Subset", function(object, index, margin = 1, keep = TRUE) standardGeneric("Subset"))
 
+#' @rdname Subset
+#' @export
 setMethod("Subset", "SNPDataLong",
           function(object, index, margin = 1, keep = TRUE) {
 
@@ -97,7 +102,6 @@ setMethod("Subset", "SNPDataLong",
 
               new_geno <- object@geno[to_select, , drop = FALSE]
               new_xref <- object@xref_path[to_select]
-
               new_path <- paste(unique(new_xref), collapse = ";")
 
               # Atualiza slots
@@ -122,4 +126,3 @@ setMethod("Subset", "SNPDataLong",
 
             return(object)
           })
-

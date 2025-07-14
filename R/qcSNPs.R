@@ -16,6 +16,7 @@
 #' @param snp_mono Logical. If TRUE, removes monomorphic SNPs (with no variation).
 #' @param remove_chr Character vector of chromosomes to exclude (e.g., c("X", "Y")).
 #' @param action One of "report" (returns a list of removed SNPs), "filter" (returns filtered SNPDataLong), or "both" (returns both).
+#' @param ... Additional optional arguments.
 #'
 #' @return Depending on the action argument:
 #' - "report": list of SNPs removed by each filter and SNPs retained.
@@ -25,22 +26,33 @@
 #' @examples
 #' \dontrun{
 #' set.seed(123)
-#' mat <- matrix(sample(c(0, 1, 2, NA), 100, replace = TRUE, prob = c(0.4, 0.4, 0.15, 0.05)),
+#' mat <- matrix(sample(c(0, 1, 2, NA), 100,
+#'               replace = TRUE, prob = c(0.4, 0.4, 0.15, 0.05)),
 #'               nrow = 10, ncol = 10)
 #' colnames(mat) <- paste0("snp", 1:10)
 #' rownames(mat) <- paste0("ind", 1:10)
 #' map <- data.frame(Name = colnames(mat), Chromosome = 1, Position = 1:10)
-#' x <- new("SNPDataLong", geno = mat, map = map, path = "dummy_path", xref_path = rep("chip1", 10))
+#' x <- new("SNPDataLong",
+#'          geno = mat,
+#'          map = map,
+#'          path = "dummy_path",
+#'          xref_path = rep("chip1", 10))
 #'
 #' # Example using multiple filters
-#' qcSNPs(x, min_snp_cr = 0.8, min_maf = 0.05, snp_mono = TRUE, no_position = TRUE, snp_position = TRUE, action = "filter")
+#' qcSNPs(x,
+#'        min_snp_cr = 0.8,
+#'        min_maf = 0.05,
+#'        snp_mono = TRUE,
+#'        no_position = TRUE,
+#'        snp_position = TRUE,
+#'        action = "filter")
 #' }
 #'
-#' @importFrom reshape2 acast
-#' @import data.table
 #' @export
 setGeneric("qcSNPs", function(x, ...) standardGeneric("qcSNPs"))
 
+#' @rdname qcSNPs
+#' @export
 setMethod("qcSNPs", "SNPDataLong", function(x,
                                             missing_ind = NULL,
                                             missing_snp = NULL,

@@ -23,7 +23,9 @@ Returns a list where each element corresponds to one group of overlapping SNPs.
 Identifies SNPs that share the same position on the same chromosome.
 }
 \examples{
-df <- data.frame(Chromosome = c(1, 1, 2), Position = c(100, 100, 200), Name = c("SNP1", "SNP2", "SNP3"))
+df <- data.frame(Chromosome = c(1, 1, 2),
+                 Position = c(100, 100, 200),
+                 Name = c("SNP1", "SNP2", "SNP3"))
 check.snp.same.position(df)
 
 }

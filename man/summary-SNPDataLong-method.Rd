@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{object}{An object of class \code{SNPDataLong}.}
+
+\item{...}{Further arguments passed to methods.}
 }
 \value{
 Prints a summary to the console. Returns \code{NULL} (invisible).
