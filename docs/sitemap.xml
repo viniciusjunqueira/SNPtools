@@ -6,7 +6,12 @@
 <url><loc>/articles/introducao.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/FImputeExport-class.html</loc></url>
+<url><loc>/reference/FImputeRunner-class.html</loc></url>
 <url><loc>/reference/FImputeRunner.html</loc></url>
+<url><loc>/reference/SNPDataLong-class.html</loc></url>
+<url><loc>/reference/SNPFileConfig-class.html</loc></url>
+<url><loc>/reference/SNPImportList-class.html</loc></url>
 <url><loc>/reference/Subset.html</loc></url>
 <url><loc>/reference/cbind_SnpMatrix.html</loc></url>
 <url><loc>/reference/check.call.rate.html</loc></url>

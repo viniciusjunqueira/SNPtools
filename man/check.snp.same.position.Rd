@@ -28,5 +28,5 @@ check.snp.same.position(df)
 
 }
 \author{
-Roberto Higa
+Roberto Higa, adaptaded by Vinicius Junqueira
 }
