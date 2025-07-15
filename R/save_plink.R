@@ -66,7 +66,7 @@ savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink
   map_out <- data.frame(
     Chromosome = map$Chromosome,
     SNP_ID = map$Name,
-    Genetic_distance = 0,
+    # Genetic_distance = 0,
     Position = map$Position,
     stringsAsFactors = FALSE
   )
@@ -76,7 +76,7 @@ savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink
   ## ----- Optionally run PLINK -----
   if (run_plink) {
     cat("Running PLINK to generate binary files...\n")
-    cmd <- paste("cd", shQuote(path), "&& plink1 --file", shQuote(name), "--out", shQuote(name), "--make-bed --noweb")
+    cmd <- paste("cd", shQuote(path), "&& plink1 --file", shQuote(name), "--map3 --out", shQuote(name), "--make-bed --noweb")
     status <- system(cmd)
 
     if (status == 0) {
