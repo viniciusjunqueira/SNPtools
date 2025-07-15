@@ -94,7 +94,13 @@ run_admixture <- function(path, prefix, admixture_path = "admixture", K,
     message(".pop file created at: ", pop_file)
   }
   
-  # Build arguments
+  # Change to analysis folder first
+  oldwd <- getwd()
+  setwd(path)
+  on.exit(setwd(oldwd), add = TRUE)
+  
+  # Local file name only
+  bed_file_name <- paste0(prefix, ".bed")
   cmd_args <- character()
   if (supervised) {
     cmd_args <- c(cmd_args, "--supervised")
@@ -108,14 +114,10 @@ run_admixture <- function(path, prefix, admixture_path = "admixture", K,
   if (!is.null(extra_args)) {
     cmd_args <- c(cmd_args, extra_args)
   }
-  cmd_args <- c(cmd_args, bed_file, as.character(K))
+  cmd_args <- c(cmd_args, bed_file_name, as.character(K))
   
   # Run
   message("Running ADMIXTURE: ", admix_exec, " ", paste(cmd_args, collapse = " "))
-  oldwd <- getwd()
-  setwd(path)
-  on.exit(setwd(oldwd), add = TRUE)
-  
   res <- system2(admix_exec, args = cmd_args)
   
   if (res != 0) {

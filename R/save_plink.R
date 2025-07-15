@@ -70,7 +70,7 @@ savePlink <- function(object, path = "plink_out", name = "plink_data", run_plink
     Position = map$Position,
     stringsAsFactors = FALSE
   )
-  utils::write.table(map_out, map_file, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+  utils::write.table(map_out, map_file, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = " ")
   cat(".map file written:", map_file, "\n")
 
   ## ----- Optionally run PLINK -----
