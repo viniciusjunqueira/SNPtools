@@ -71,7 +71,7 @@ read.fimpute <- function(file, method = c("R", "Rcpp")) {
     stringsAsFactors = FALSE
   )
 
-  snp_long <- new("SNPDataLong", geno = snp_matrix, map = map_out, path = file)
+  snp_long <- new("SNPDataLong", geno = snp_matrix, map = map_out, path = file, xref_path = "")
   return(snp_long)
 }
 
