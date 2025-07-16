@@ -4,27 +4,18 @@
 \alias{runAnticlusteringPCA}
 \title{Run PCA and Anticlustering on SNPDataLong}
 \usage{
-runAnticlusteringPCA(
-  object,
-  K = 2,
-  n_pcs = 20,
-  center = TRUE,
-  scale = TRUE,
-  sizes = NULL
-)
+runAnticlusteringPCA(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE)
 }
 \arguments{
 \item{object}{An object of class SNPDataLong.}
 
-\item{K}{Number of groups for anticlustering.}
+\item{K}{Number of groups for anticlustering, or vector of group sizes (as in anticlust package).}
 
 \item{n_pcs}{Number of top principal components to use. If < 1, interpreted as proportion of variance to be explained (e.g., 0.8 means PCs explaining at least 80% variance).}
 
 \item{center}{Logical or numeric. Center columns before PCA (default: TRUE).}
 
 \item{scale}{Logical or numeric. Scale columns before PCA (default: TRUE).}
-
-\item{sizes}{Optional vector with sizes for each group (must sum to nrow(object)).}
 }
 \value{
 A list with:

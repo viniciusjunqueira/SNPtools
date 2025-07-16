@@ -51,11 +51,10 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #' Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering grouping.
 #'
 #' @param object An object of class SNPDataLong.
-#' @param K Number of groups for anticlustering.
+#' @param K Number of groups for anticlustering, or vector of group sizes (as in anticlust package).
 #' @param n_pcs Number of top principal components to use. If < 1, interpreted as proportion of variance to be explained (e.g., 0.8 means PCs explaining at least 80% variance).
 #' @param center Logical or numeric. Center columns before PCA (default: TRUE).
 #' @param scale Logical or numeric. Scale columns before PCA (default: TRUE).
-#' @param sizes Optional vector with sizes for each group (must sum to nrow(object)).
 #'
 #' @return A list with:
 #' - groups: vector with group assignments.
@@ -68,7 +67,7 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #' table(res$groups)
 #' }
 #' @export
-runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE, sizes = NULL) {
+runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
   if (!inherits(object, "SNPDataLong")) {
     stop("Input object must be of class SNPDataLong.")
   }
@@ -98,20 +97,12 @@ runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale
   top_pcs <- pca_res$x[, seq_len(n_selected), drop = FALSE]
   cat("Top PCs extracted.\n")
 
-  # Check sizes argument
-  if (!is.null(sizes)) {
-    if (length(sizes) != K) {
-      stop("Length of 'sizes' must be equal to K.")
-    }
-    if (sum(sizes) != nrow(top_pcs)) {
-      stop("Sum of 'sizes' must be equal to the number of individuals (rows in top PCs).")
-    }
-    cat("Running anticlustering with specified group sizes...\n")
-    groups <- anticlust::fast_anticlustering(top_pcs, K = K, sizes = sizes)
-  } else {
-    cat("Running anticlustering with", K, "groups...\n")
-    groups <- anticlust::fast_anticlustering(top_pcs, K = K)
-  }
+  cat("Running anticlustering with K =", ifelse(length(K) == 1, K, paste(K, collapse = ", ")), "...\n")
+  groups <- anticlust::anticlustering(
+    features = top_pcs,
+    K = K,
+    standardize = TRUE
+  )
 
   cat("Anticlustering completed. Groups assigned.\n")
 
