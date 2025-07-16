@@ -52,9 +52,10 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #'
 #' @param object An object of class SNPDataLong.
 #' @param K Number of groups for anticlustering.
-#' @param n_pcs Number of top principal components to use (default: 20).
+#' @param n_pcs Number of top principal components to use. If < 1, interpreted as proportion of variance to be explained (e.g., 0.8 means PCs explaining at least 80% variance).
 #' @param center Logical or numeric. Center columns before PCA (default: TRUE).
 #' @param scale Logical or numeric. Scale columns before PCA (default: TRUE).
+#' @param sizes Optional vector with sizes for each group (must sum to nrow(object)).
 #'
 #' @return A list with:
 #' - groups: vector with group assignments.
@@ -63,11 +64,11 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 #'
 #' @examples
 #' \dontrun{
-#' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
+#' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 0.8)
 #' table(res$groups)
 #' }
 #' @export
-runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
+runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE, sizes = NULL) {
   if (!inherits(object, "SNPDataLong")) {
     stop("Input object must be of class SNPDataLong.")
   }
@@ -78,11 +79,40 @@ runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale
   cat("Running PCA...\n")
   pca_res <- stats::prcomp(geno_df, center = FALSE, scale. = FALSE)
 
-  top_pcs <- pca_res$x[, seq_len(n_pcs)]
-  cat("Top", n_pcs, "PCs extracted.\n")
+  # Determine number of PCs to use
+  var_explained <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+  cum_var <- cumsum(var_explained)
 
-  cat("Running anticlustering with", K, "groups...\n")
-  groups <- anticlust::fast_anticlustering(top_pcs, K = K)
+  if (is.numeric(n_pcs) && n_pcs < 1) {
+    n_selected <- which(cum_var >= n_pcs)[1]
+    cat("Automatically selecting", n_selected, "PCs to explain at least", round(n_pcs * 100, 1), "% variance.\n")
+  } else {
+    n_selected <- n_pcs
+    cat("Using fixed", n_selected, "PCs.\n")
+  }
+
+  if (n_selected > ncol(pca_res$x)) {
+    stop("Requested number of PCs exceeds available PCs.")
+  }
+
+  top_pcs <- pca_res$x[, seq_len(n_selected), drop = FALSE]
+  cat("Top PCs extracted.\n")
+
+  # Check sizes argument
+  if (!is.null(sizes)) {
+    if (length(sizes) != K) {
+      stop("Length of 'sizes' must be equal to K.")
+    }
+    if (sum(sizes) != nrow(top_pcs)) {
+      stop("Sum of 'sizes' must be equal to the number of individuals (rows in top PCs).")
+    }
+    cat("Running anticlustering with specified group sizes...\n")
+    groups <- anticlust::fast_anticlustering(top_pcs, K = K, sizes = sizes)
+  } else {
+    cat("Running anticlustering with", K, "groups...\n")
+    groups <- anticlust::fast_anticlustering(top_pcs, K = K)
+  }
+
   cat("Anticlustering completed. Groups assigned.\n")
 
   return(list(

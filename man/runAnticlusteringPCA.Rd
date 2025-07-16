@@ -4,18 +4,27 @@
 \alias{runAnticlusteringPCA}
 \title{Run PCA and Anticlustering on SNPDataLong}
 \usage{
-runAnticlusteringPCA(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE)
+runAnticlusteringPCA(
+  object,
+  K = 2,
+  n_pcs = 20,
+  center = TRUE,
+  scale = TRUE,
+  sizes = NULL
+)
 }
 \arguments{
 \item{object}{An object of class SNPDataLong.}
 
 \item{K}{Number of groups for anticlustering.}
 
-\item{n_pcs}{Number of top principal components to use (default: 20).}
+\item{n_pcs}{Number of top principal components to use. If < 1, interpreted as proportion of variance to be explained (e.g., 0.8 means PCs explaining at least 80% variance).}
 
 \item{center}{Logical or numeric. Center columns before PCA (default: TRUE).}
 
 \item{scale}{Logical or numeric. Scale columns before PCA (default: TRUE).}
+
+\item{sizes}{Optional vector with sizes for each group (must sum to nrow(object)).}
 }
 \value{
 A list with:
@@ -28,7 +37,7 @@ Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticluste
 }
 \examples{
 \dontrun{
-res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 20)
+res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 0.8)
 table(res$groups)
 }
 }
