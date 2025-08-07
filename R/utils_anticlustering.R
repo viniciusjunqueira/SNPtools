@@ -27,7 +27,14 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 
   snpsum <- snpStats::col.summary(object = object@geno)
   mono <- check.snp.monomorf(snpsum)
-  object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
+  if (is.null(mono)) mono <- character(0)  # in case your current checker returns NULL
+
+  # drop monomorphic SNPs only if there are any
+  if (length(mono) > 0) {
+    object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
+  } else {
+    message("No monomorphic SNPs detected. Skipping subset.")
+  }
 
   geno_matrix <- as(object@geno, "numeric")
   geno_df <- as.data.frame(geno_matrix)
