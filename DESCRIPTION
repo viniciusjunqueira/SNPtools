@@ -22,7 +22,9 @@ Imports:
     stats,
     utils,
     MASS,
-    snpStats
+    snpStats,
+    magrittr,
+    reshape2
 LinkingTo: 
     Rcpp
 Suggests:
