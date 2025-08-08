@@ -27,7 +27,14 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
 
   snpsum <- snpStats::col.summary(object = object@geno)
   mono <- check.snp.monomorf(snpsum)
-  object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
+  if (is.null(mono)) mono <- character(0)  # in case your current checker returns NULL
+
+  # drop monomorphic SNPs only if there are any
+  if (length(mono) > 0) {
+    object <- Subset(object = object, index = mono, margin = 2, keep = FALSE)
+  } else {
+    message("No monomorphic SNPs detected. Skipping subset.")
+  }
 
   geno_matrix <- as(object@geno, "numeric")
   geno_df <- as.data.frame(geno_matrix)
@@ -46,80 +53,99 @@ genoToDF <- function(object, center = FALSE, scale = FALSE) {
   return(geno_df)
 }
 
-#' Run PCA and Anticlustering on SNPDataLong
+#' Run PCA and anticlustering on SNPDataLong
 #'
-#' Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering grouping.
+#' Converts a SNPDataLong object to a data.frame, runs PCA, and performs
+#' anticlustering on the selected principal components.
 #'
-#' @param object An object of class SNPDataLong.
-#' @param K Number of groups for anticlustering.
-#' @param n_pcs Number of top principal components to use. If < 1, interpreted as proportion of variance to be explained (e.g., 0.8 means PCs explaining at least 80% variance).
-#' @param center Logical or numeric. Center columns before PCA (default: TRUE).
-#' @param scale Logical or numeric. Scale columns before PCA (default: TRUE).
-#' @param sizes Optional vector with sizes for each group (must sum to nrow(object)).
+#' @param object An object of class \code{SNPDataLong}.
+#' @param K Number of groups for anticlustering, or a vector of group sizes
+#'   (as in \pkg{anticlust}).
+#' @param n_pcs Number of top principal components to use. If \code{< 1},
+#'   it is interpreted as the proportion of variance to be explained (e.g.,
+#'   \code{0.8} means PCs explaining at least 80\% variance).
+#' @param center Logical or numeric. Passed to \code{\link[base]{scale}} via
+#'   \code{genoToDF}. If \code{TRUE}, center columns; if numeric, a vector of
+#'   column means. Default: \code{TRUE}.
+#' @param scale Logical or numeric. Passed to \code{\link[base]{scale}} via
+#'   \code{genoToDF}. If \code{TRUE}, scale to unit variance; if numeric,
+#'   a vector of column sds. Default: \code{TRUE}.
 #'
-#' @return A list with:
-#' - groups: vector with group assignments.
-#' - pca: the PCA result object (prcomp).
-#' - pcs: matrix of top PCs used in anticlustering.
+#' @returns
+#' A list with components:
+#' \describe{
+#'   \item{groups}{Integer vector with anticlustering group assignments.}
+#'   \item{pca}{The PCA result object (from \code{stats::prcomp}).}
+#'   \item{pcs}{Numeric matrix of the PCs used for anticlustering.}
+#' }
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf requireNamespace("anticlust", quietly = TRUE) && exists("nelore_imputed")
 #' res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 0.8)
 #' table(res$groups)
-#' }
+#'
 #' @export
-runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE, sizes = NULL) {
+#' @importFrom stats prcomp
+runAnticlusteringPCA <- function(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE) {
   if (!inherits(object, "SNPDataLong")) {
     stop("Input object must be of class SNPDataLong.")
   }
 
   geno_df <- genoToDF(object, center = center, scale = scale)
-  cat("Genotype data frame created for PCA.\n")
+  message("Genotype data frame created for PCA.")
 
-  cat("Running PCA...\n")
+  message("Running PCA...")
+  # genoToDF already applied centering/scaling, so keep prcomp(center=FALSE, scale.=FALSE)
   pca_res <- stats::prcomp(geno_df, center = FALSE, scale. = FALSE)
 
   # Determine number of PCs to use
-  var_explained <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+  var_explained <- pca_res$sdev^2
+  var_explained <- var_explained / sum(var_explained)
   cum_var <- cumsum(var_explained)
 
-  if (is.numeric(n_pcs) && n_pcs < 1) {
+  if (!is.numeric(n_pcs) || length(n_pcs) != 1L || is.na(n_pcs)) {
+    stop("`n_pcs` must be a single numeric value.")
+  }
+
+  if (n_pcs < 1) {
     n_selected <- which(cum_var >= n_pcs)[1]
-    cat("Automatically selecting", n_selected, "PCs to explain at least", round(n_pcs * 100, 1), "% variance.\n")
+    if (is.na(n_selected)) {
+      stop("Could not reach requested variance proportion with available PCs.")
+    }
+    message(
+      "Automatically selecting ", n_selected,
+      " PCs to explain at least ", round(n_pcs * 100, 1), "% variance."
+    )
   } else {
-    n_selected <- n_pcs
-    cat("Using fixed", n_selected, "PCs.\n")
+    n_selected <- as.integer(n_pcs)
+    message("Using fixed ", n_selected, " PCs.")
   }
 
   if (n_selected > ncol(pca_res$x)) {
-    stop("Requested number of PCs exceeds available PCs.")
+    stop("Requested number of PCs (", n_selected, ") exceeds available PCs (", ncol(pca_res$x), ").")
   }
 
   top_pcs <- pca_res$x[, seq_len(n_selected), drop = FALSE]
-  cat("Top PCs extracted.\n")
+  message("Top PCs extracted.")
 
-  # Check sizes argument
-  if (!is.null(sizes)) {
-    if (length(sizes) != K) {
-      stop("Length of 'sizes' must be equal to K.")
-    }
-    if (sum(sizes) != nrow(top_pcs)) {
-      stop("Sum of 'sizes' must be equal to the number of individuals (rows in top PCs).")
-    }
-    cat("Running anticlustering with specified group sizes...\n")
-    groups <- anticlust::fast_anticlustering(top_pcs, K = K, sizes = sizes)
-  } else {
-    cat("Running anticlustering with", K, "groups...\n")
-    groups <- anticlust::fast_anticlustering(top_pcs, K = K)
+  if (!requireNamespace("anticlust", quietly = TRUE)) {
+    stop("Package 'anticlust' is required. Please install it.")
   }
 
-  cat("Anticlustering completed. Groups assigned.\n")
+  message("Running anticlustering with K = ",
+          if (length(K) == 1) K else paste(K, collapse = ", "), " ...")
+  groups <- anticlust::anticlustering(
+    features = top_pcs,
+    K = K,
+    standardize = TRUE
+  )
 
-  return(list(
+  message("Anticlustering completed. Groups assigned.")
+
+  list(
     groups = groups,
     pca = pca_res,
     pcs = top_pcs
-  ))
+  )
 }
 
 #' Plot PCA groups from anticlustering result

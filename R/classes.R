@@ -20,16 +20,9 @@ setClassUnion("MapDataFrameOrList", c("data.frame", "list"))
 #' @slot path A character string with the file path or identifier. Must be of length 1.
 #' @slot xref_path A character string with an additional identifier or path. Must be of length 1.
 #'
-#' @section Validity checks:
-#' \itemize{
-#'   \item \code{geno} must be of class SnpMatrix.
-#'   \item \code{map} must be a data.frame or list.
-#'   \item \code{path} and \code{xref_path} must be character strings of length 1.
-#'   \item The number of SNP markers (columns in geno) must match the number of markers in map.
-#'   \item The number of individuals in geno (rows) can be checked against other information if needed.
-#' }
-#'
-#' @export
+#' Validity function for SNPDataLong (internal)
+#' @noRd
+#' @keywords internal
 .validSNPDataLong <- function(object) {
   errors <- character()
 
@@ -56,24 +49,20 @@ setClassUnion("MapDataFrameOrList", c("data.frame", "list"))
     } else if (is.list(object@map) && !is.null(object@map$markers)) {
       n_markers_map <- length(object@map$markers)
     } else {
-      n_markers_map <- NA
+      n_markers_map <- NA_integer_
     }
 
     if (!is.na(n_markers_map) && n_markers_geno != n_markers_map) {
-      errors <- c(errors, sprintf("Number of SNPs in 'geno' (%d) does not match the number of SNPs in 'map' (%d).", 
-                                  n_markers_geno, n_markers_map))
+      errors <- c(errors, sprintf(
+        "Number of SNPs in 'geno' (%d) does not match the number of SNPs in 'map' (%d).",
+        n_markers_geno, n_markers_map
+      ))
     }
   }
 
-  n_ind_geno <- nrow(object@geno)
-  # Uncomment below if xref_path becomes a vector per individual:
-  # if (length(object@xref_path) != n_ind_geno) {
-  #   errors <- c(errors, sprintf("Number of individuals in 'geno' (%d) does not match length of 'xref_path' (%d).", 
-  #                               n_ind_geno, length(object@xref_path)))
-  # }
-
   if (length(errors) == 0) TRUE else errors
 }
+
 
 setClass("SNPDataLong",
          slots = c(

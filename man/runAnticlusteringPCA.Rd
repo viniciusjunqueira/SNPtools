@@ -2,42 +2,43 @@
 % Please edit documentation in R/utils_anticlustering.R
 \name{runAnticlusteringPCA}
 \alias{runAnticlusteringPCA}
-\title{Run PCA and Anticlustering on SNPDataLong}
+\title{Run PCA and anticlustering on SNPDataLong}
 \usage{
-runAnticlusteringPCA(
-  object,
-  K = 2,
-  n_pcs = 20,
-  center = TRUE,
-  scale = TRUE,
-  sizes = NULL
-)
+runAnticlusteringPCA(object, K = 2, n_pcs = 20, center = TRUE, scale = TRUE)
 }
 \arguments{
-\item{object}{An object of class SNPDataLong.}
+\item{object}{An object of class \code{SNPDataLong}.}
 
-\item{K}{Number of groups for anticlustering.}
+\item{K}{Number of groups for anticlustering, or a vector of group sizes
+(as in \pkg{anticlust}).}
 
-\item{n_pcs}{Number of top principal components to use. If < 1, interpreted as proportion of variance to be explained (e.g., 0.8 means PCs explaining at least 80% variance).}
+\item{n_pcs}{Number of top principal components to use. If \code{< 1},
+it is interpreted as the proportion of variance to be explained (e.g.,
+\code{0.8} means PCs explaining at least 80\% variance).}
 
-\item{center}{Logical or numeric. Center columns before PCA (default: TRUE).}
+\item{center}{Logical or numeric. Passed to \code{\link[base]{scale}} via
+\code{genoToDF}. If \code{TRUE}, center columns; if numeric, a vector of
+column means. Default: \code{TRUE}.}
 
-\item{scale}{Logical or numeric. Scale columns before PCA (default: TRUE).}
-
-\item{sizes}{Optional vector with sizes for each group (must sum to nrow(object)).}
+\item{scale}{Logical or numeric. Passed to \code{\link[base]{scale}} via
+\code{genoToDF}. If \code{TRUE}, scale to unit variance; if numeric,
+a vector of column sds. Default: \code{TRUE}.}
 }
 \value{
-A list with:
-- groups: vector with group assignments.
-- pca: the PCA result object (prcomp).
-- pcs: matrix of top PCs used in anticlustering.
+A list with components:
+\describe{
+  \item{groups}{Integer vector with anticlustering group assignments.}
+  \item{pca}{The PCA result object (from \code{stats::prcomp}).}
+  \item{pcs}{Numeric matrix of the PCs used for anticlustering.}
+}
 }
 \description{
-Converts a SNPDataLong object to a data.frame, runs PCA, and performs anticlustering grouping.
+Converts a SNPDataLong object to a data.frame, runs PCA, and performs
+anticlustering on the selected principal components.
 }
 \examples{
-\dontrun{
+\dontshow{if (requireNamespace("anticlust", quietly = TRUE) && exists("nelore_imputed")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 res <- runAnticlusteringPCA(nelore_imputed, K = 2, n_pcs = 0.8)
 table(res$groups)
-}
+\dontshow{\}) # examplesIf}
 }
