@@ -2,7 +2,7 @@
 % Please edit documentation in R/mat2SnpMatrix.R
 \name{as_snpmatrix}
 \alias{as_snpmatrix}
-\title{Convert a genotype matrix to snpStats::SnpMatrix}
+\title{Convert a genotype matrix or data.frame to snpStats::SnpMatrix}
 \usage{
 as_snpmatrix(
   geno,
@@ -12,9 +12,9 @@ as_snpmatrix(
 )
 }
 \arguments{
-\item{geno}{A samples x SNPs matrix with genotypes coded as 0, 1, 2, or NA.
-Can be numeric/integer or character. \code{rownames} = samples,
-\code{colnames} = SNPs.}
+\item{geno}{A samples x SNPs matrix or data.frame with genotypes coded as
+0, 1, 2, or NA. Can be numeric/integer or character. \code{rownames} =
+sample IDs, \code{colnames} = SNP IDs.}
 
 \item{coding}{One of \code{"012"} or \code{"AAABBB"}. For character inputs only.
 \code{"012"} expects \code{"0"}, \code{"1"}, \code{"2"}, and \code{missing_codes}.
@@ -32,7 +32,18 @@ A \code{snpStats::SnpMatrix} with the same \code{dimnames} as \code{geno}.
 \description{
 This function converts a genotype matrix coded as 0/1/2/NA or AA/AB/BB to a
 \code{snpStats::SnpMatrix} object. It includes checks for coding validity,
-missing values, and duplicate sample or SNP IDs.
+missing values, and duplicate sample or SNP IDs, and preserves row and column
+names from the input.
+}
+\details{
+The function accepts both \code{matrix} and \code{data.frame} inputs. For
+\code{data.frame} objects, all columns are coerced to a common type using
+\code{as.matrix()}, which preserves \code{rownames} and \code{colnames}.
+
+The returned \code{SnpMatrix} object stores each genotype as a single byte,
+which is memory-efficient compared to integer storage. However, large datasets
+still require substantial RAM. For very large genotype sets, consider using
+on-disk formats such as \pkg{SNPRelate} (GDS) or \pkg{bigsnpr}.
 }
 \examples{
 # Numeric 0/1/2 with NAs
