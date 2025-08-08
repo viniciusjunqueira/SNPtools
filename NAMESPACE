@@ -2,6 +2,7 @@
 
 export(FImputeRunner)
 export(Subset)
+export(as_snpmatrix)
 export(cbind_SnpMatrix)
 export(check.call.rate)
 export(check.ibs)
